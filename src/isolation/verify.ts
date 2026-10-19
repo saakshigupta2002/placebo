@@ -65,13 +65,16 @@ export function verifyIsolation(
     verified = false;
     notes.push(`Control arm connected to MCP servers: ${control.mcpServers.join(", ")}.`);
   }
+  // Each arm must load exactly its own intervention skills on top of the same built-ins.
+  const isIntervention = (s: string) => s.startsWith(`${INTERVENTION_PLUGIN}:`);
+  const loaded = (snap: InitSnapshot) => snap.skills.filter(isIntervention).map(strip).sort();
+  const builtins = (snap: InitSnapshot) => snap.skills.filter((s) => !isIntervention(s)).sort();
+  const expectedControl = arms.control.skills.map((s) => s.name).sort();
   const expected = arms.treatment.skills.map((s) => s.name).sort();
-  const extra = treatment.skills
-    .filter((s) => !control.skills.includes(s))
-    .map(strip)
-    .sort();
-  const missing = expected.filter((e) => !extra.includes(e));
-  const unexpected = extra.filter((e) => !expected.includes(e));
+  const gotControl = loaded(control);
+  const got = loaded(treatment);
+  const missing = expected.filter((e) => !got.includes(e));
+  const unexpected = got.filter((e) => !expected.includes(e));
   if (missing.length) {
     verified = false;
     notes.push(`Treatment arm did not load the skill under test: ${missing.join(", ")}.`);
@@ -80,18 +83,33 @@ export function verifyIsolation(
     verified = false;
     notes.push(`Treatment arm loaded extra skills: ${unexpected.join(", ")}.`);
   }
-  if (
-    arms.control.skills.length === 0 &&
-    control.skills.some((s) => s.startsWith(`${INTERVENTION_PLUGIN}:`))
-  ) {
+  if (gotControl.join("|") !== expectedControl.join("|")) {
     verified = false;
-    notes.push("Control arm loaded the intervention.");
+    notes.push(
+      expectedControl.length
+        ? `Control arm should have loaded only the baseline (${expectedControl.join(", ")}) but loaded ${gotControl.join(", ") || "nothing"}.`
+        : "Control arm loaded the intervention.",
+    );
+  }
+  if (arms.control.agent === arms.treatment.agent) {
+    const extraBuiltins = builtins(treatment).filter((s) => !builtins(control).includes(s));
+    if (extraBuiltins.length) {
+      verified = false;
+      notes.push(`Treatment arm loaded extra skills: ${extraBuiltins.map(strip).join(", ")}.`);
+    }
   }
   if (verified) {
+    const base = builtins(control);
     notes.push(
-      `Control arm saw ${control.skills.length ? `only built-in skills (${control.skills.join(", ")})` : "no skills"}, no plugins and no MCP servers.`,
+      `Control arm saw ${base.length ? `only built-in skills (${base.join(", ")})` : "no skills"}${expectedControl.length ? ` plus the baseline version of ${expectedControl.join(", ")}` : ""}, no plugins and no MCP servers.`,
     );
-    if (expected.length) notes.push(`Treatment arm saw the same plus ${expected.join(", ")}.`);
+    if (expected.length) {
+      notes.push(
+        expectedControl.length
+          ? `Treatment arm saw the same built-ins plus the new version of ${expected.join(", ")}.`
+          : `Treatment arm saw the same plus ${expected.join(", ")}.`,
+      );
+    }
     if (userSkills.length)
       notes.push(`None of your ${userSkills.length} personal skills leaked into either arm.`);
   }

@@ -40,6 +40,7 @@ export interface TrialCliOptions {
   failOn?: string;
   quiet?: boolean;
   resume?: string;
+  baseline?: string;
 }
 
 function sample<T>(xs: T[], n: number, seed: number): T[] {
@@ -129,6 +130,7 @@ export async function trialAction(
       instructions: o.instructions,
       vsModel: o.vsModel,
       vsAgent: o.vsAgent,
+      baseline: o.baseline,
     }));
     const source = await resolveTaskSource(cwd, { pack: o.pack, tasks: o.tasks });
     taskSource = o.pack
@@ -234,6 +236,10 @@ export function registerTrial(program: Command): void {
     .argument("[skill]", "skill to test: a folder with SKILL.md, a SKILL.md file or a GitHub URL")
     .option("-a, --agent <agent>", "agent to run (claude-code, codex, fake)", "claude-code")
     .option("-m, --model <model>", "model for both arms (defaults to the agent's own default)")
+    .option(
+      "--baseline <version>",
+      "compare against an earlier version of the skill: a folder, a GitHub URL or a git revision like HEAD~1",
+    )
     .option(
       "--instructions <file>",
       "test an instructions file (written as CLAUDE.md or AGENTS.md in treatment)",

@@ -102,6 +102,7 @@ Placebo never rounds an inconclusive result up. With fewer than 6 tasks no resul
 | Question | Command |
 |---|---|
 | Does this skill help? | `placebo trial ./skills/my-skill` or `placebo trial https://github.com/user/repo/tree/main/skills/x` |
+| Did my edit to the skill help? | `placebo trial ./skills/my-skill --baseline HEAD~1` |
 | Does the new CLAUDE.md help? | `placebo trial --instructions ./CLAUDE.new.md` |
 | Is the bigger model worth it here? | `placebo trial --model sonnet --vs-model opus` |
 | Which agent is better on this repo? | `placebo trial --agent claude-code --vs-agent codex` |
@@ -146,6 +147,14 @@ That copies a badge, the markdown report and `trial.json` into your repo and pri
 ```markdown
 [![placebo: works · -18% cost](placebo-badge.svg)](PLACEBO-TRIAL.md)
 ```
+
+When you change a skill, test the new version against the old one instead of against nothing. The baseline can be a folder, a GitHub URL or any git revision of the repo that holds the skill, so you can compare your working copy with the last commit:
+
+```bash
+placebo trial ./skills/my-skill --baseline HEAD~1 --pack starter-js
+```
+
+Control runs the old version, treatment runs the new one. The verdict reads "New version: cuts cost by 12%..." and the report shows how often each version fired, so you can tell whether a rewritten description made the skill trigger more often.
 
 To keep a skill honest over time, run a trial in CI and fail the build on a bad verdict:
 

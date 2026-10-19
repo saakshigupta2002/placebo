@@ -15,6 +15,10 @@ A trial answers one question: **does this change make the agent better or worse 
 
 Each task runs `repeats` times per arm (default 2). The order of the two arms is decided by a seeded coin flip per task and repeat, so neither arm always gets a warm cache or the quieter minute.
 
+## Comparing two versions of a skill
+
+`--baseline` changes what control means. Instead of the agent with no skill, control runs the agent with the earlier version and treatment runs the new one. The baseline can be a folder, a GitHub URL or a git revision; a revision is exported with `git archive` from the repository that holds the new version, so `--baseline HEAD~1` compares the working copy with the last commit. The isolation check confirms each arm loaded exactly its own version. Firing is reported for both arms and verdict headlines start with "New version:". If neither version ever fires, the verdict is PLACEBO, because the edit cannot have changed anything.
+
 ## Sealed workspaces
 
 Every run gets a fresh directory built with `git archive` from the task's starting commit, then committed once so agents that expect git still work. **There is no history in it.** An agent cannot run `git log` and find the future fix, which is a known way agents cheat on repository benchmarks.

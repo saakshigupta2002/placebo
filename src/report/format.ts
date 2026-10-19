@@ -1,3 +1,4 @@
+import { shortRef } from "../core/intervention.js";
 import type { MetricResult, RunRecord, TrialRecord } from "../core/types.js";
 
 export function fmtTokens(n: number): string {
@@ -90,6 +91,8 @@ export function interventionLine(t: TrialRecord): string {
   switch (i.kind) {
     case "skill":
       return `skill "${i.label}"${hash}`;
+    case "skill-version":
+      return `skill "${i.skill?.name ?? i.label}" new (sha ${i.contentHash?.slice(0, 8)}) vs baseline ${shortRef(i.baseline?.source ?? "")} (sha ${i.baseline?.contentHash.slice(0, 8)})`;
     case "instructions":
       return `instructions file ${i.label}${hash}`;
     case "model":

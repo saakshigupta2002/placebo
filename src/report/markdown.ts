@@ -37,7 +37,9 @@ export function renderMarkdown(t: TrialRecord): string {
       ? Math.round((r.activation.fired / r.activation.runs) * 100)
       : 0;
     out.push(
-      `- **Skill fired** in ${r.activation.fired} of ${r.activation.runs} treatment runs (${share}%).`,
+      r.activation.control
+        ? `- **Skill fired:** new version in ${r.activation.fired} of ${r.activation.runs} runs (${share}%), old version in ${r.activation.control.fired} of ${r.activation.control.runs}.`
+        : `- **Skill fired** in ${r.activation.fired} of ${r.activation.runs} treatment runs (${share}%).`,
     );
   }
   const kinds = Object.entries(r.adverse.events).filter(([, v]) => v.control + v.treatment > 0);

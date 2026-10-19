@@ -24,6 +24,7 @@ Placebo runs the same real coding tasks twice, once with the thing under test an
 | User wants to know | Command |
 |---|---|
 | Does this skill help? | `placebo trial <skill-folder-or-github-url>` |
+| Did my edit to this skill make it better or worse? | `placebo trial <skill> --baseline <old-folder-or-git-revision>` (for example `--baseline HEAD~1`) |
 | Does this CLAUDE.md / AGENTS.md help? | `placebo trial --instructions <file>` |
 | Is model B worth it over model A? | `placebo trial --model <a> --vs-model <b>` |
 | Is agent B better than agent A here? | `placebo trial --agent claude-code --vs-agent codex` |

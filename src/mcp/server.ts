@@ -30,6 +30,12 @@ export async function startMcpServer(): Promise<void> {
           .string()
           .optional()
           .describe("Skill to test: folder with SKILL.md, SKILL.md path or GitHub URL"),
+        baseline: z
+          .string()
+          .optional()
+          .describe(
+            "Earlier version of the skill to compare against: folder, GitHub URL or git revision like HEAD~1",
+          ),
         instructions: z
           .string()
           .optional()
@@ -68,6 +74,7 @@ export async function startMcpServer(): Promise<void> {
         if (v !== undefined && v !== false)
           args.push(`--${name}`, ...(v === true ? [] : [String(v)]));
       };
+      flag("baseline", a.baseline);
       flag("instructions", a.instructions);
       flag("vs-model", a.vs_model);
       flag("vs-agent", a.vs_agent);

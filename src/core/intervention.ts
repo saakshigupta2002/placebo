@@ -1,6 +1,6 @@
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import YAML from "yaml";
 import { getAdapter } from "../adapters/registry.js";
 import { ensureDir } from "../util/fs.js";
@@ -86,6 +86,52 @@ export async function resolveSkill(
   return { name, dir, contentHash: hashDir(dir, (rel) => rel.startsWith(".git")) };
 }
 
+/**
+ * Resolve the baseline version of a skill. A path or URL resolves like any skill; anything else
+ * is treated as a git revision of the repository that holds the new version, so
+ * `--baseline HEAD~1` compares your working copy against the last commit.
+ */
+export async function resolveBaseline(
+  ref: string,
+  newSkillDir: string,
+  cacheRoot = join(homedir(), ".cache", "placebo", "skills"),
+): Promise<SkillRef & { contentHash: string }> {
+  if (existsSync(resolve(ref)) || GH.test(ref)) return resolveSkill(ref, cacheRoot);
+  const rev = ref.startsWith("git:") ? ref.slice(4) : ref;
+  const top = await run("git", ["rev-parse", "--show-toplevel"], { cwd: newSkillDir });
+  if (top.code !== 0)
+    throw new InterventionError(
+      `Baseline "${ref}" is not a folder and ${newSkillDir} is not inside a git repository.`,
+    );
+  const root = realpathSync(top.stdout.trim());
+  const ok = await run("git", ["rev-parse", "--verify", `${rev}^{commit}`], { cwd: root });
+  if (ok.code !== 0)
+    throw new InterventionError(
+      `Baseline "${ref}" is not a folder, a URL or a git revision in ${root}.`,
+    );
+  const sha = ok.stdout.trim();
+  const rel = relative(root, realpathSync(newSkillDir));
+  const dest = join(ensureDir(cacheRoot), `rev-${shortHash(`${root}@${sha}:${rel}`, 12)}`);
+  if (!existsSync(join(dest, rel || ".", "SKILL.md"))) {
+    ensureDir(dest);
+    const tar = join(dest, ".export.tar");
+    const r = await run("git", ["archive", "--format=tar", "-o", tar, sha, "--", rel || "."], {
+      cwd: root,
+    });
+    if (r.code !== 0)
+      throw new InterventionError(`The skill did not exist at ${rev}: ${r.stderr.trim()}`);
+    await run("tar", ["-xf", tar, "-C", dest]);
+    await run("rm", ["-f", tar]);
+  }
+  return resolveSkill(join(dest, rel || "."), cacheRoot);
+}
+
+/** A readable name for a baseline: git revisions as typed, paths as their last two segments. */
+export function shortRef(ref: string): string {
+  if (!ref.includes("/") || GH.test(ref)) return ref;
+  return ref.replace(/\/+$/, "").split("/").slice(-2).join("/");
+}
+
 export interface ArmOptions {
   agent: string;
   model?: string;
@@ -93,6 +139,8 @@ export interface ArmOptions {
   instructions?: string;
   vsModel?: string;
   vsAgent?: string;
+  /** An earlier version of the skill: a folder, a GitHub URL or a git revision such as HEAD~1. */
+  baseline?: string;
 }
 
 /** Turn CLI options into an intervention and two arms that differ only in that intervention. */
@@ -111,6 +159,35 @@ export async function buildArms(
   const agent = getAdapter(o.agent).id;
   const control: ArmSpec = { name: "control", agent, model: o.model, skills: [] };
 
+  if (o.baseline && !o.skill)
+    throw new InterventionError(
+      "--baseline needs the new version of the skill as the first argument.",
+    );
+  if (o.skill && o.baseline) {
+    const s = await resolveSkill(o.skill);
+    const b = await resolveBaseline(o.baseline, s.dir);
+    if (b.contentHash === s.contentHash) {
+      throw new InterventionError(
+        `The two versions are identical (${s.contentHash.slice(0, 8)}). Edit the skill first, or pick another baseline.`,
+      );
+    }
+    const label =
+      b.name === s.name ? `${s.name} (new vs ${shortRef(o.baseline)})` : `${s.name} vs ${b.name}`;
+    return {
+      intervention: {
+        kind: "skill-version",
+        label,
+        source: o.skill,
+        contentHash: s.contentHash,
+        skill: { name: s.name, dir: s.dir },
+        baseline: { name: b.name, dir: b.dir, contentHash: b.contentHash, source: o.baseline },
+      },
+      arms: {
+        control: { ...control, skills: [{ name: b.name, dir: b.dir }] },
+        treatment: { ...control, name: "treatment", skills: [{ name: s.name, dir: s.dir }] },
+      },
+    };
+  }
   if (o.skill) {
     const s = await resolveSkill(o.skill);
     return {

@@ -28,12 +28,22 @@ export function summarizeAdverse(runs: RunRecord[]): TrialResults["adverse"] {
 
 export function computeResults(trial: TrialRecord): TrialResults {
   const metrics = computeMetrics(trial.runs, trial.design.seed);
-  const treated = trial.runs.filter(
-    (r) => r.arm === "treatment" && r.status !== "error" && r.activated !== null,
-  );
+  const observed = (arm: "control" | "treatment") =>
+    trial.runs.filter((r) => r.arm === arm && r.status !== "error" && r.activated !== null);
+  const count = (rs: typeof trial.runs) => ({
+    fired: rs.filter((r) => r.activated).length,
+    runs: rs.length,
+  });
+  const kind = trial.intervention.kind;
+  const treated = observed("treatment");
   const activation =
-    trial.intervention.kind === "skill" && treated.length
-      ? { fired: treated.filter((r) => r.activated).length, runs: treated.length }
+    (kind === "skill" || kind === "skill-version") && treated.length
+      ? {
+          ...count(treated),
+          ...(kind === "skill-version" && observed("control").length
+            ? { control: count(observed("control")) }
+            : {}),
+        }
       : null;
   const adverse = summarizeAdverse(trial.runs);
   let verdict = decideVerdict({ kind: trial.intervention.kind, metrics, activation, adverse });

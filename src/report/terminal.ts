@@ -67,7 +67,7 @@ export function renderTerminal(t: TrialRecord, reportPath?: string): string {
       : 0;
     const txt = `${r.activation.fired}/${r.activation.runs} runs (${share}%)`;
     lines.push(
-      `  ${pad("skill fired", cols[0]!)}${pad("-", cols[1]!)}${r.activation.fired === 0 ? pc.yellow(txt) : txt}`,
+      `  ${pad("skill fired", cols[0]!)}${pad(r.activation.control ? `${r.activation.control.fired}/${r.activation.control.runs}` : "-", cols[1]!)}${r.activation.fired === 0 ? pc.yellow(txt) : txt}`,
     );
   }
   lines.push("");

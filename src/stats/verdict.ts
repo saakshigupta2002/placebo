@@ -39,7 +39,20 @@ export interface VerdictInput {
   adverse: TrialResults["adverse"];
 }
 
-export function decideVerdict({ kind, metrics, activation, adverse }: VerdictInput): Verdict {
+export function decideVerdict(input: VerdictInput): Verdict {
+  const v = decide(input);
+  // For version comparisons the verdict is about the new version relative to the old one.
+  if (
+    input.kind === "skill-version" &&
+    v.label !== "INCONCLUSIVE" &&
+    !v.headline.startsWith("Neither")
+  ) {
+    return { ...v, headline: `New version: ${v.headline}` };
+  }
+  return v;
+}
+
+function decide({ kind, metrics, activation, adverse }: VerdictInput): Verdict {
   const pass = metrics.find((m) => m.key === "pass");
   const spend = metrics.find((m) => m.key === "cost") ?? metrics.find((m) => m.key === "tokens");
   const spendName = spend?.key === "cost" ? "cost" : "tokens";
@@ -64,6 +77,22 @@ export function decideVerdict({ kind, metrics, activation, adverse }: VerdictInp
     };
   }
 
+  if (
+    kind === "skill-version" &&
+    activation &&
+    activation.runs > 0 &&
+    activation.fired === 0 &&
+    (activation.control?.fired ?? 0) === 0
+  ) {
+    reasons.push(
+      "Neither version of the skill activated, so the edit cannot have changed anything.",
+    );
+    return {
+      label: "PLACEBO",
+      headline: "Neither version ever activated. The edit made no difference.",
+      reasons,
+    };
+  }
   if (kind === "skill" && activation && activation.runs > 0 && activation.fired === 0) {
     reasons.push(
       `The skill never activated in ${activation.runs} runs, so the agent behaved as if it was not installed.`,
@@ -90,6 +119,11 @@ export function decideVerdict({ kind, metrics, activation, adverse }: VerdictInp
     );
   if (activation && kind === "skill")
     reasons.push(`Skill fired in ${activation.fired} of ${activation.runs} runs.`);
+  if (activation && kind === "skill-version") {
+    reasons.push(
+      `New version fired in ${activation.fired} of ${activation.runs} runs${activation.control ? `, the old one in ${activation.control.fired} of ${activation.control.runs}` : ""}.`,
+    );
+  }
 
   if (passDown) {
     return {

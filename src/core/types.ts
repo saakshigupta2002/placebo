@@ -15,7 +15,7 @@ export interface InstructionsRef {
   content: string;
 }
 
-export type InterventionKind = "skill" | "instructions" | "model" | "agent";
+export type InterventionKind = "skill" | "skill-version" | "instructions" | "model" | "agent";
 
 export interface Intervention {
   kind: InterventionKind;
@@ -26,6 +26,8 @@ export interface Intervention {
   /** Content hash of the intervention so a trial can be re-run against the same bytes. */
   contentHash?: string;
   skill?: SkillRef;
+  /** For "skill-version": the earlier version the new one is compared against. */
+  baseline?: SkillRef & { contentHash: string; source: string };
   instructions?: InstructionsRef;
 }
 
@@ -144,7 +146,8 @@ export interface InitSnapshot {
 
 export interface TrialResults {
   metrics: MetricResult[];
-  activation: { fired: number; runs: number } | null;
+  /** How often the skill under test fired in treatment; for version comparisons, control too. */
+  activation: { fired: number; runs: number; control?: { fired: number; runs: number } } | null;
   adverse: {
     /** Runs with at least one warning or critical event, per arm. */
     control: number;

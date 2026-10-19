@@ -268,10 +268,10 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; text-align: cen
   <div class="verdict ${verdict}"><span class="pill">${VERDICT_WORD[verdict]}</span><span class="headline">${esc(headline)}</span></div>
   <div class="tiles">${shown.map((m) => tile(t, m)).join("")}</div>
   <div class="facts">
-    ${act ? `<span><span class="dot ${act.runs && act.fired / act.runs < 0.5 ? "warn" : ""}"></span>Skill fired in <b>${act.fired} of ${act.runs}</b> runs</span>` : ""}
+    ${act ? `<span><span class="dot ${act.runs && act.fired / act.runs < 0.5 ? "warn" : ""}"></span>${act.control ? "New version" : "Skill"} fired in <b>${act.fired} of ${act.runs}</b> runs${act.control ? ` (old: ${act.control.fired} of ${act.control.runs})` : ""}</span>` : ""}
     <span><span class="dot ${advCrit ? "bad" : advTotal ? "warn" : ""}"></span>${advCrit ? `<b>${advCrit} critical</b> adverse events` : advTotal ? `<b>${advTotal}</b> runs with warnings` : "<b>No</b> adverse events"}</span>
     <span><span class="dot ${t.isolation.verified ? "" : "bad"}"></span>Isolation <b>${t.isolation.verified ? "verified" : "not verified"}</b></span>
-    <span>Control is the same agent without the ${esc(t.intervention.kind)}</span>
+    <span>${t.intervention.kind === "skill-version" ? "Control is the same agent with the previous version" : `Control is the same agent without the ${esc(t.intervention.kind)}`}</span>
   </div>
 </header>
 
@@ -315,7 +315,7 @@ ${
 <section class="method">
   <h2>How this was measured</h2>
   <div class="panel">
-    <p>Each task is a real change from the repository's history (or a hand-written task with its own check). For every task the agent runs in fresh workspaces exported from the starting commit with no git history, so it cannot find the answer in future commits. Control runs the agent as is. Treatment runs the same agent with the ${esc(t.intervention.kind)} under test. Nothing else differs.</p>
+    <p>Each task is a real change from the repository's history (or a hand-written task with its own check). For every task the agent runs in fresh workspaces exported from the starting commit with no git history, so it cannot find the answer in future commits. ${t.intervention.kind === "skill-version" ? "Control runs the agent with the previous version of the skill. Treatment runs the same agent with the new version." : `Control runs the agent as is. Treatment runs the same agent with the ${esc(t.intervention.kind)} under test.`} Nothing else differs.</p>
     <p>After each run, hidden tests from the original change are restored over whatever the agent left, then the task's check command decides pass or fail. Tokens and cost come from the agent's own usage report.</p>
     <p>Effects are estimated per task and then averaged across tasks, so repeats sharpen each task's estimate without counting as extra evidence. Pass rate is a difference in percentage points. Tokens, cost and time are geometric-mean ratios. P-values come from an exact paired sign-flip permutation test across tasks. The 95% intervals come from inverting that same test, so an interval excludes zero exactly when p is below 0.05.</p>
   </div>
