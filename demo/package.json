@@ -1,0 +1,20 @@
+{
+  "name": "placebo-demo",
+  "private": true,
+  "type": "module",
+  "description": "Source of the Placebo README walkthrough. Renders docs/assets/placebo-demo.mp4 and demo-walkthrough.gif from real trial output.",
+  "scripts": {
+    "studio": "remotion studio",
+    "bundle": "remotion bundle --log=error",
+    "render:mp4": "remotion render build Demo ../docs/assets/placebo-demo.mp4 --crf=20 --concurrency=2",
+    "render:gif": "remotion render build Demo ../docs/assets/demo-walkthrough.gif --codec=gif --every-nth-frame=3 --scale=0.5 --concurrency=2",
+    "poster": "remotion still build Demo ../docs/assets/demo-poster.png --frame=410",
+    "all": "npm run bundle && npm run render:mp4 && npm run render:gif && npm run poster"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.513",
+    "remotion": "^4.0.513",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  }
+}

@@ -52,13 +52,21 @@ npx placebo-cli trial ./path/to/skill         # or a GitHub URL to a skill folde
 
 You get a table in the terminal, a self-contained `report.html` (the card above), a `trial.json` with every number and a `REPORT.md` ready for a PR or README.
 
-## See it in action
-
 <p align="center">
   <img src="docs/assets/demo-terminal.svg" width="900" alt="Animated terminal: a real Placebo trial of the test-first skill on Claude Code with Haiku. Runs tick past, isolation is verified and the verdict is Harmful: it costs 161% more with no gain in correctness.">
 </p>
 
-<sub>A real run, sped up. The output is copied line for line from trial <code>t_launch1</code>: a "read the tests first" skill on the bundled starter pack, Claude Code with Haiku. The full record, including the exact skill and every run's diff, is in <a href="trials/test-first-haiku-2026-10">trials/test-first-haiku-2026-10</a>. Placebo stopped by itself after 8 tasks once the cost difference was settled (p = 0.004). The whole trial cost $1.69.</sub>
+<sub>A real run, sped up. Every line comes from trial <code>t_launch1</code>, with some progress lines skipped: a "read the tests first" skill on the bundled starter pack, Claude Code with Haiku. Placebo stopped by itself after 8 tasks once the cost difference was settled (p = 0.004). The whole trial cost $1.69. The full record, including the exact skill and every run's diff, is in <a href="trials/test-first-haiku-2026-10">trials/test-first-haiku-2026-10</a>.</sub>
+
+## See it in action
+
+<p align="center">
+  <a href="docs/assets/placebo-demo.mp4">
+    <img src="docs/assets/demo-walkthrough.gif" width="900" alt="Walkthrough: a real trial runs in the terminal and ends Harmful, the report opens in a browser and scrolls through the verdict, every effect with its interval, adverse events and the task drill-down, then a new version of the skill is tested against the last commit and Placebo says it needs about 17 tasks to settle.">
+  </a>
+</p>
+
+<p align="center"><sub>43 seconds of real output: the trial above, its report and a test of an edited skill against the last commit. <a href="docs/assets/placebo-demo.mp4">Watch it in full quality (1080p MP4)</a>.</sub></p>
 
 ## How it works
 
