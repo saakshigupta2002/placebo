@@ -1,0 +1,1193 @@
+{
+  "schema": "placebo.trial/v1",
+  "id": "t_launch1",
+  "createdAt": "2026-10-19T13:33:16.779Z",
+  "placeboVersion": "0.1.0",
+  "intervention": {
+    "kind": "skill",
+    "label": "test-first",
+    "source": "examples/skills/test-first",
+    "contentHash": "c80c12e9dcd8f875c7c0c4d3b082347de6041b1df88fc102074d730d0cbaa1d4",
+    "skill": {
+      "name": "test-first",
+      "dir": "trials/test-first-haiku-2026-10/skill"
+    }
+  },
+  "arms": {
+    "control": {
+      "name": "control",
+      "agent": "claude-code",
+      "model": "haiku",
+      "skills": []
+    },
+    "treatment": {
+      "name": "treatment",
+      "agent": "claude-code",
+      "model": "haiku",
+      "skills": [
+        {
+          "name": "test-first",
+          "dir": "trials/test-first-haiku-2026-10/skill"
+        }
+      ]
+    }
+  },
+  "agent": {
+    "id": "claude-code",
+    "version": "2.1.25",
+    "model": "haiku"
+  },
+  "design": {
+    "tasks": 12,
+    "repeats": 2,
+    "seed": 2026,
+    "concurrency": 3,
+    "isolation": "flags",
+    "allowWeb": false,
+    "budgetUsd": 3.5,
+    "untilConfident": true,
+    "taskSource": {
+      "pack": "starter-js"
+    },
+    "stoppedEarly": "confident after 8 tasks (tokens, cost settled)"
+  },
+  "tasks": [
+    {
+      "id": "csv-quotes",
+      "title": "parseCSV breaks on Excel exports",
+      "hash": "6c4b7b6298710be0",
+      "source": "pack"
+    },
+    {
+      "id": "deep-merge-safety",
+      "title": "deepMerge mutates input and allows prototype pollution",
+      "hash": "9fe6477b9b3bfaa4",
+      "source": "pack"
+    },
+    {
+      "id": "lru-cache",
+      "title": "Implement LRUCache",
+      "hash": "0d03e46062dc075f",
+      "source": "pack"
+    },
+    {
+      "id": "merge-intervals",
+      "title": "mergeIntervals gives wrong answers",
+      "hash": "6c6ff340701dfb43",
+      "source": "pack"
+    },
+    {
+      "id": "money-format",
+      "title": "formatMoney output is not usable on invoices",
+      "hash": "2856723e7014c5d1",
+      "source": "pack"
+    },
+    {
+      "id": "parse-duration",
+      "title": "Implement parseDuration",
+      "hash": "d86a945cc241006f",
+      "source": "pack"
+    },
+    {
+      "id": "query-string",
+      "title": "Implement parseQuery and stringifyQuery",
+      "hash": "e5ee12aac4f755b7",
+      "source": "pack"
+    },
+    {
+      "id": "roman-numerals",
+      "title": "Implement Roman numeral conversion",
+      "hash": "0116df6232c2600d",
+      "source": "pack"
+    },
+    {
+      "id": "semver-compare",
+      "title": "Implement compareVersions",
+      "hash": "dc836f8895081176",
+      "source": "pack"
+    },
+    {
+      "id": "slugify-accents",
+      "title": "slugify produces broken slugs",
+      "hash": "d905e2cd53352383",
+      "source": "pack"
+    },
+    {
+      "id": "topo-sort",
+      "title": "Implement topoSort with cycle detection",
+      "hash": "bc5acc6c617ba2d7",
+      "source": "pack"
+    },
+    {
+      "id": "word-wrap",
+      "title": "Implement wrap",
+      "hash": "935a31fd2f51727b",
+      "source": "pack"
+    }
+  ],
+  "runs": [
+    {
+      "taskId": "word-wrap",
+      "arm": "control",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 137,
+        "outputTokens": 1025,
+        "cacheReadTokens": 52509,
+        "cacheWriteTokens": 1832
+      },
+      "totalTokens": 55503,
+      "costUsd": 0.012802899999999999,
+      "costEstimated": false,
+      "durationMs": 11005,
+      "turns": 3,
+      "toolCalls": 2,
+      "linesAdded": 57,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/word-wrap/control-2",
+      "status": "failed",
+      "passed": false
+    },
+    {
+      "taskId": "word-wrap",
+      "arm": "control",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 137,
+        "outputTokens": 1006,
+        "cacheReadTokens": 52503,
+        "cacheWriteTokens": 1700
+      },
+      "totalTokens": 55346,
+      "costUsd": 0.0125423,
+      "costEstimated": false,
+      "durationMs": 13320,
+      "turns": 3,
+      "toolCalls": 2,
+      "linesAdded": 41,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/word-wrap/control-1",
+      "status": "failed",
+      "passed": false
+    },
+    {
+      "taskId": "merge-intervals",
+      "arm": "control",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 149,
+        "outputTokens": 1425,
+        "cacheReadTokens": 90103,
+        "cacheWriteTokens": 2469
+      },
+      "totalTokens": 94146,
+      "costUsd": 0.01937055,
+      "costEstimated": false,
+      "durationMs": 15256,
+      "turns": 5,
+      "toolCalls": 4,
+      "linesAdded": 13,
+      "linesRemoved": 4,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/merge-intervals/control-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "word-wrap",
+      "arm": "treatment",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 8356,
+        "outputTokens": 2716,
+        "cacheReadTokens": 195798,
+        "cacheWriteTokens": 5516
+      },
+      "totalTokens": 212386,
+      "costUsd": 0.0484108,
+      "costEstimated": false,
+      "durationMs": 32904,
+      "turns": 12,
+      "toolCalls": 11,
+      "linesAdded": 66,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": false,
+      "adverse": [],
+      "dir": "runs/word-wrap/treatment-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "word-wrap",
+      "arm": "treatment",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 9395,
+        "outputTokens": 3783,
+        "cacheReadTokens": 326850,
+        "cacheWriteTokens": 7226
+      },
+      "totalTokens": 347254,
+      "costUsd": 0.0700275,
+      "costEstimated": false,
+      "durationMs": 39752,
+      "turns": 18,
+      "toolCalls": 16,
+      "linesAdded": 62,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": true,
+      "adverse": [],
+      "dir": "runs/word-wrap/treatment-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "merge-intervals",
+      "arm": "control",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 149,
+        "outputTokens": 1333,
+        "cacheReadTokens": 89889,
+        "cacheWriteTokens": 2271
+      },
+      "totalTokens": 93642,
+      "costUsd": 0.01864165,
+      "costEstimated": false,
+      "durationMs": 14268,
+      "turns": 5,
+      "toolCalls": 4,
+      "linesAdded": 9,
+      "linesRemoved": 4,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/merge-intervals/control-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "merge-intervals",
+      "arm": "treatment",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 2462,
+        "outputTokens": 2912,
+        "cacheReadTokens": 257310,
+        "cacheWriteTokens": 6227
+      },
+      "totalTokens": 268911,
+      "costUsd": 0.050536750000000005,
+      "costEstimated": false,
+      "durationMs": 39322,
+      "turns": 16,
+      "toolCalls": 14,
+      "linesAdded": 49,
+      "linesRemoved": 4,
+      "filesChanged": 2,
+      "activated": true,
+      "adverse": [
+        {
+          "kind": "test-tamper",
+          "severity": "info",
+          "detail": "Wrote its own test at a hidden test path (replaced before grading).",
+          "evidence": "test/intervals.test.mjs"
+        }
+      ],
+      "dir": "runs/merge-intervals/treatment-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "merge-intervals",
+      "arm": "treatment",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 2935,
+        "outputTokens": 2705,
+        "cacheReadTokens": 236986,
+        "cacheWriteTokens": 6657
+      },
+      "totalTokens": 249283,
+      "costUsd": 0.04847985,
+      "costEstimated": false,
+      "durationMs": 40536,
+      "turns": 15,
+      "toolCalls": 13,
+      "linesAdded": 62,
+      "linesRemoved": 4,
+      "filesChanged": 2,
+      "activated": true,
+      "adverse": [
+        {
+          "kind": "test-tamper",
+          "severity": "info",
+          "detail": "Wrote its own test at a hidden test path (replaced before grading).",
+          "evidence": "test/intervals.test.mjs"
+        }
+      ],
+      "dir": "runs/merge-intervals/treatment-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "money-format",
+      "arm": "control",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 162,
+        "outputTokens": 1813,
+        "cacheReadTokens": 128701,
+        "cacheWriteTokens": 3157
+      },
+      "totalTokens": 133833,
+      "costUsd": 0.026043349999999996,
+      "costEstimated": false,
+      "durationMs": 21679,
+      "turns": 8,
+      "toolCalls": 7,
+      "linesAdded": 22,
+      "linesRemoved": 2,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/money-format/control-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "money-format",
+      "arm": "control",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 3603,
+        "outputTokens": 2759,
+        "cacheReadTokens": 169764,
+        "cacheWriteTokens": 4264
+      },
+      "totalTokens": 180390,
+      "costUsd": 0.0397044,
+      "costEstimated": false,
+      "durationMs": 31253,
+      "turns": 10,
+      "toolCalls": 9,
+      "linesAdded": 23,
+      "linesRemoved": 2,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/money-format/control-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "money-format",
+      "arm": "treatment",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 2464,
+        "outputTokens": 3710,
+        "cacheReadTokens": 281551,
+        "cacheWriteTokens": 7205
+      },
+      "totalTokens": 294930,
+      "costUsd": 0.058175349999999994,
+      "costEstimated": false,
+      "durationMs": 53536,
+      "turns": 16,
+      "toolCalls": 14,
+      "linesAdded": 71,
+      "linesRemoved": 1,
+      "filesChanged": 2,
+      "activated": true,
+      "adverse": [
+        {
+          "kind": "test-tamper",
+          "severity": "info",
+          "detail": "Wrote its own test at a hidden test path (replaced before grading).",
+          "evidence": "test/money.test.mjs"
+        }
+      ],
+      "dir": "runs/money-format/treatment-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "semver-compare",
+      "arm": "control",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 8944,
+        "outputTokens": 3666,
+        "cacheReadTokens": 212050,
+        "cacheWriteTokens": 6180
+      },
+      "totalTokens": 230840,
+      "costUsd": 0.056204,
+      "costEstimated": false,
+      "durationMs": 36098,
+      "turns": 13,
+      "toolCalls": 12,
+      "linesAdded": 117,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/semver-compare/control-1",
+      "status": "failed",
+      "passed": false
+    },
+    {
+      "taskId": "semver-compare",
+      "arm": "control",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 137,
+        "outputTokens": 1418,
+        "cacheReadTokens": 52630,
+        "cacheWriteTokens": 2273
+      },
+      "totalTokens": 56458,
+      "costUsd": 0.015331250000000001,
+      "costEstimated": false,
+      "durationMs": 12341,
+      "turns": 3,
+      "toolCalls": 2,
+      "linesAdded": 68,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/semver-compare/control-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "money-format",
+      "arm": "treatment",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 4302,
+        "outputTokens": 4747,
+        "cacheReadTokens": 440556,
+        "cacheWriteTokens": 11572
+      },
+      "totalTokens": 461177,
+      "costUsd": 0.0865576,
+      "costEstimated": false,
+      "durationMs": 57756,
+      "turns": 23,
+      "toolCalls": 21,
+      "linesAdded": 65,
+      "linesRemoved": 2,
+      "filesChanged": 2,
+      "activated": true,
+      "adverse": [
+        {
+          "kind": "test-tamper",
+          "severity": "info",
+          "detail": "Wrote its own test at a hidden test path (replaced before grading).",
+          "evidence": "test/money.test.mjs"
+        }
+      ],
+      "dir": "runs/money-format/treatment-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "semver-compare",
+      "arm": "treatment",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 5147,
+        "outputTokens": 3909,
+        "cacheReadTokens": 338891,
+        "cacheWriteTokens": 6868
+      },
+      "totalTokens": 354815,
+      "costUsd": 0.0671661,
+      "costEstimated": false,
+      "durationMs": 43638,
+      "turns": 18,
+      "toolCalls": 16,
+      "linesAdded": 93,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": true,
+      "adverse": [],
+      "dir": "runs/semver-compare/treatment-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "deep-merge-safety",
+      "arm": "control",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 1247,
+        "outputTokens": 2593,
+        "cacheReadTokens": 169289,
+        "cacheWriteTokens": 4402
+      },
+      "totalTokens": 177531,
+      "costUsd": 0.0366434,
+      "costEstimated": false,
+      "durationMs": 28314,
+      "turns": 11,
+      "toolCalls": 10,
+      "linesAdded": 62,
+      "linesRemoved": 2,
+      "filesChanged": 2,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/deep-merge-safety/control-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "semver-compare",
+      "arm": "treatment",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 8728,
+        "outputTokens": 4245,
+        "cacheReadTokens": 308860,
+        "cacheWriteTokens": 7987
+      },
+      "totalTokens": 329820,
+      "costUsd": 0.07082275,
+      "costEstimated": false,
+      "durationMs": 53342,
+      "turns": 20,
+      "toolCalls": 18,
+      "linesAdded": 91,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": true,
+      "adverse": [],
+      "dir": "runs/semver-compare/treatment-2",
+      "status": "failed",
+      "passed": false
+    },
+    {
+      "taskId": "deep-merge-safety",
+      "arm": "treatment",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 2933,
+        "outputTokens": 3976,
+        "cacheReadTokens": 288157,
+        "cacheWriteTokens": 8939
+      },
+      "totalTokens": 304005,
+      "costUsd": 0.06280245,
+      "costEstimated": false,
+      "durationMs": 49489,
+      "turns": 16,
+      "toolCalls": 14,
+      "linesAdded": 74,
+      "linesRemoved": 4,
+      "filesChanged": 2,
+      "activated": true,
+      "adverse": [],
+      "dir": "runs/deep-merge-safety/treatment-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "deep-merge-safety",
+      "arm": "control",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 3969,
+        "outputTokens": 2573,
+        "cacheReadTokens": 169894,
+        "cacheWriteTokens": 4183
+      },
+      "totalTokens": 180619,
+      "costUsd": 0.03905215,
+      "costEstimated": false,
+      "durationMs": 31241,
+      "turns": 11,
+      "toolCalls": 10,
+      "linesAdded": 15,
+      "linesRemoved": 4,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/deep-merge-safety/control-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "deep-merge-safety",
+      "arm": "treatment",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 2420,
+        "outputTokens": 8676,
+        "cacheReadTokens": 511591,
+        "cacheWriteTokens": 17476
+      },
+      "totalTokens": 540163,
+      "costUsd": 0.1188041,
+      "costEstimated": false,
+      "durationMs": 84279,
+      "turns": 23,
+      "toolCalls": 21,
+      "linesAdded": 102,
+      "linesRemoved": 4,
+      "filesChanged": 2,
+      "activated": true,
+      "adverse": [
+        {
+          "kind": "test-tamper",
+          "severity": "info",
+          "detail": "Wrote its own test at a hidden test path (replaced before grading).",
+          "evidence": "test/merge.test.mjs"
+        }
+      ],
+      "dir": "runs/deep-merge-safety/treatment-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "csv-quotes",
+      "arm": "control",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 8022,
+        "outputTokens": 3212,
+        "cacheReadTokens": 172782,
+        "cacheWriteTokens": 4517
+      },
+      "totalTokens": 188533,
+      "costUsd": 0.04700645,
+      "costEstimated": false,
+      "durationMs": 35494,
+      "turns": 10,
+      "toolCalls": 9,
+      "linesAdded": 78,
+      "linesRemoved": 4,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/csv-quotes/control-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "csv-quotes",
+      "arm": "control",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 8466,
+        "outputTokens": 3871,
+        "cacheReadTokens": 193121,
+        "cacheWriteTokens": 5509
+      },
+      "totalTokens": 210967,
+      "costUsd": 0.054019349999999994,
+      "costEstimated": false,
+      "durationMs": 38549,
+      "turns": 10,
+      "toolCalls": 9,
+      "linesAdded": 73,
+      "linesRemoved": 4,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/csv-quotes/control-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "csv-quotes",
+      "arm": "treatment",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 3027,
+        "outputTokens": 6657,
+        "cacheReadTokens": 618516,
+        "cacheWriteTokens": 15759
+      },
+      "totalTokens": 643959,
+      "costUsd": 0.11786235000000002,
+      "costEstimated": false,
+      "durationMs": 72982,
+      "turns": 28,
+      "toolCalls": 26,
+      "linesAdded": 140,
+      "linesRemoved": 4,
+      "filesChanged": 2,
+      "activated": true,
+      "adverse": [
+        {
+          "kind": "test-tamper",
+          "severity": "info",
+          "detail": "Wrote its own test at a hidden test path (replaced before grading).",
+          "evidence": "test/csv.test.mjs"
+        }
+      ],
+      "dir": "runs/csv-quotes/treatment-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "csv-quotes",
+      "arm": "treatment",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 2992,
+        "outputTokens": 3548,
+        "cacheReadTokens": 287125,
+        "cacheWriteTokens": 8639
+      },
+      "totalTokens": 302304,
+      "costUsd": 0.06024325,
+      "costEstimated": false,
+      "durationMs": 48838,
+      "turns": 16,
+      "toolCalls": 14,
+      "linesAdded": 124,
+      "linesRemoved": 4,
+      "filesChanged": 2,
+      "activated": true,
+      "adverse": [
+        {
+          "kind": "test-tamper",
+          "severity": "info",
+          "detail": "Wrote its own test at a hidden test path (replaced before grading).",
+          "evidence": "test/csv.test.mjs"
+        }
+      ],
+      "dir": "runs/csv-quotes/treatment-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "lru-cache",
+      "arm": "control",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 137,
+        "outputTokens": 1157,
+        "cacheReadTokens": 52581,
+        "cacheWriteTokens": 1971
+      },
+      "totalTokens": 55846,
+      "costUsd": 0.013643850000000003,
+      "costEstimated": false,
+      "durationMs": 11316,
+      "turns": 3,
+      "toolCalls": 2,
+      "linesAdded": 63,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/lru-cache/control-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "lru-cache",
+      "arm": "control",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 137,
+        "outputTokens": 1267,
+        "cacheReadTokens": 52580,
+        "cacheWriteTokens": 2028
+      },
+      "totalTokens": 56012,
+      "costUsd": 0.014265,
+      "costEstimated": false,
+      "durationMs": 11179,
+      "turns": 3,
+      "toolCalls": 2,
+      "linesAdded": 72,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/lru-cache/control-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "lru-cache",
+      "arm": "treatment",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 9758,
+        "outputTokens": 4577,
+        "cacheReadTokens": 347902,
+        "cacheWriteTokens": 7951
+      },
+      "totalTokens": 370188,
+      "costUsd": 0.07737195000000001,
+      "costEstimated": false,
+      "durationMs": 47935,
+      "turns": 22,
+      "toolCalls": 20,
+      "linesAdded": 41,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": true,
+      "adverse": [],
+      "dir": "runs/lru-cache/treatment-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "slugify-accents",
+      "arm": "control",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 137,
+        "outputTokens": 788,
+        "cacheReadTokens": 52530,
+        "cacheWriteTokens": 1652
+      },
+      "totalTokens": 55107,
+      "costUsd": 0.011395,
+      "costEstimated": false,
+      "durationMs": 8693,
+      "turns": 3,
+      "toolCalls": 2,
+      "linesAdded": 6,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/slugify-accents/control-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "lru-cache",
+      "arm": "treatment",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 5500,
+        "outputTokens": 3507,
+        "cacheReadTokens": 230614,
+        "cacheWriteTokens": 5791
+      },
+      "totalTokens": 245412,
+      "costUsd": 0.05333515,
+      "costEstimated": false,
+      "durationMs": 36633,
+      "turns": 13,
+      "toolCalls": 11,
+      "linesAdded": 41,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": true,
+      "adverse": [],
+      "dir": "runs/lru-cache/treatment-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "slugify-accents",
+      "arm": "treatment",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 4984,
+        "outputTokens": 1790,
+        "cacheReadTokens": 169397,
+        "cacheWriteTokens": 3669
+      },
+      "totalTokens": 179840,
+      "costUsd": 0.035459950000000004,
+      "costEstimated": false,
+      "durationMs": 24826,
+      "turns": 13,
+      "toolCalls": 11,
+      "linesAdded": 6,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": true,
+      "adverse": [],
+      "dir": "runs/slugify-accents/treatment-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "slugify-accents",
+      "arm": "control",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 137,
+        "outputTokens": 774,
+        "cacheReadTokens": 52527,
+        "cacheWriteTokens": 1571
+      },
+      "totalTokens": 55009,
+      "costUsd": 0.011223450000000001,
+      "costEstimated": false,
+      "durationMs": 8876,
+      "turns": 3,
+      "toolCalls": 2,
+      "linesAdded": 6,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/slugify-accents/control-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "topo-sort",
+      "arm": "control",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 9401,
+        "outputTokens": 4522,
+        "cacheReadTokens": 153889,
+        "cacheWriteTokens": 5601
+      },
+      "totalTokens": 173413,
+      "costUsd": 0.05440115000000001,
+      "costEstimated": false,
+      "durationMs": 37266,
+      "turns": 8,
+      "toolCalls": 7,
+      "linesAdded": 97,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/topo-sort/control-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "slugify-accents",
+      "arm": "treatment",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 4781,
+        "outputTokens": 2942,
+        "cacheReadTokens": 332515,
+        "cacheWriteTokens": 8806
+      },
+      "totalTokens": 349044,
+      "costUsd": 0.06375,
+      "costEstimated": false,
+      "durationMs": 48870,
+      "turns": 18,
+      "toolCalls": 16,
+      "linesAdded": 45,
+      "linesRemoved": 1,
+      "filesChanged": 2,
+      "activated": true,
+      "adverse": [
+        {
+          "kind": "test-tamper",
+          "severity": "info",
+          "detail": "Wrote its own test at a hidden test path (replaced before grading).",
+          "evidence": "test/slugify.test.mjs"
+        }
+      ],
+      "dir": "runs/slugify-accents/treatment-2",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "topo-sort",
+      "arm": "treatment",
+      "rep": 0,
+      "usage": {
+        "inputTokens": 8838,
+        "outputTokens": 4103,
+        "cacheReadTokens": 296734,
+        "cacheWriteTokens": 6353
+      },
+      "totalTokens": 316028,
+      "costUsd": 0.06696765,
+      "costEstimated": false,
+      "durationMs": 42432,
+      "turns": 19,
+      "toolCalls": 17,
+      "linesAdded": 101,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": true,
+      "adverse": [],
+      "dir": "runs/topo-sort/treatment-1",
+      "status": "passed",
+      "passed": true
+    },
+    {
+      "taskId": "topo-sort",
+      "arm": "control",
+      "rep": 1,
+      "usage": {
+        "inputTokens": 9142,
+        "outputTokens": 3338,
+        "cacheReadTokens": 210650,
+        "cacheWriteTokens": 4926
+      },
+      "totalTokens": 228056,
+      "costUsd": 0.05305450000000001,
+      "costEstimated": false,
+      "durationMs": 35557,
+      "turns": 12,
+      "toolCalls": 11,
+      "linesAdded": 102,
+      "linesRemoved": 1,
+      "filesChanged": 1,
+      "activated": null,
+      "adverse": [],
+      "dir": "runs/topo-sort/control-2",
+      "status": "failed",
+      "passed": false
+    }
+  ],
+  "isolation": {
+    "mode": "flags",
+    "verified": true,
+    "control": {
+      "skills": [
+        "keybindings-help"
+      ],
+      "plugins": [],
+      "mcpServers": [],
+      "model": "claude-haiku-4-5-20251001",
+      "agentVersion": "2.1.25"
+    },
+    "treatment": {
+      "skills": [
+        "keybindings-help",
+        "placebo-intervention:test-first"
+      ],
+      "plugins": [
+        "placebo-intervention"
+      ],
+      "mcpServers": [],
+      "model": "claude-haiku-4-5-20251001",
+      "agentVersion": "2.1.25"
+    },
+    "notes": [
+      "Control arm saw only built-in skills (keybindings-help), no plugins and no MCP servers.",
+      "Treatment arm saw the same plus test-first.",
+      "None of your 5 personal skills leaked into either arm."
+    ]
+  },
+  "finishedAt": "2026-10-19T13:40:25.732Z",
+  "results": {
+    "metrics": [
+      {
+        "key": "pass",
+        "label": "tests passed",
+        "unit": "points",
+        "control": 0.7777777777777778,
+        "treatment": 0.9444444444444444,
+        "effect": 16.666666666666664,
+        "ciLow": -3.7410548732926444e-08,
+        "ciHigh": 50.00000004990094,
+        "pValue": 0.5,
+        "pWilcoxon": 0.5,
+        "n": 9,
+        "lowerIsBetter": false
+      },
+      {
+        "key": "tokens",
+        "label": "tokens / task",
+        "unit": "ratio",
+        "control": 126736.16666666667,
+        "treatment": 338085.94444444444,
+        "effect": 1.9804811419238781,
+        "ciLow": 1.0843183042819753,
+        "ciHigh": 3.2165125937887513,
+        "pValue": 0.00390625,
+        "pWilcoxon": 0.00390625,
+        "n": 9,
+        "lowerIsBetter": true
+      },
+      {
+        "key": "cost",
+        "label": "cost / task",
+        "unit": "ratio",
+        "control": 0.029741372222222222,
+        "treatment": 0.06798562222222222,
+        "effect": 1.6088311380473743,
+        "ciLow": 0.7857638725210425,
+        "ciHigh": 2.768294856899798,
+        "pValue": 0.00390625,
+        "pWilcoxon": 0.00390625,
+        "n": 9,
+        "lowerIsBetter": true
+      },
+      {
+        "key": "time",
+        "label": "time / task",
+        "unit": "ratio",
+        "control": 22316.944444444445,
+        "treatment": 47750.11111111111,
+        "effect": 1.3644280848597905,
+        "ciLow": 0.7135730921842862,
+        "ciHigh": 2.2125817892817032,
+        "pValue": 0.00390625,
+        "pWilcoxon": 0.00390625,
+        "n": 9,
+        "lowerIsBetter": true
+      },
+      {
+        "key": "lines",
+        "label": "lines changed",
+        "unit": "ratio",
+        "control": 53.333333333333336,
+        "treatment": 76.16666666666667,
+        "effect": 0.6827043593598372,
+        "ciLow": 0.01535728953224802,
+        "ciHigh": 1.7964878114865415,
+        "pValue": 0.0390625,
+        "pWilcoxon": 0.0390625,
+        "n": 9,
+        "lowerIsBetter": true,
+        "neutral": true
+      }
+    ],
+    "activation": {
+      "fired": 16,
+      "runs": 17
+    },
+    "adverse": {
+      "control": 0,
+      "treatment": 0,
+      "criticalControl": 0,
+      "criticalTreatment": 0,
+      "events": {},
+      "notes": {
+        "test-tamper": {
+          "control": 0,
+          "treatment": 8
+        }
+      }
+    },
+    "verdict": {
+      "label": "HARMFUL",
+      "headline": "Costs 161% more with no gain in correctness.",
+      "reasons": [
+        "Tests passed: +17 pts (95% CI -0 pts to +50 pts, p=0.500).",
+        "Cost: +160.9% (95% CI +78.6% to +276.8%, p=0.004).",
+        "Skill fired in 16 of 17 runs."
+      ]
+    }
+  }
+}

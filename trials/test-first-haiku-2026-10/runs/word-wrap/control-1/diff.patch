@@ -1,0 +1,51 @@
+diff --git a/src/wrap.mjs b/src/wrap.mjs
+index 829dd05..76fc503 100644
+--- a/src/wrap.mjs
++++ b/src/wrap.mjs
+@@ -5,5 +5,45 @@
+  * @returns {string}
+  */
+ export function wrap(text, width) {
+-  throw new Error("not implemented");
++  if (!Number.isInteger(width) || width <= 0) {
++    throw new RangeError("width must be a positive integer");
++  }
++
++  const paragraphs = text.split("\n");
++  const wrappedParagraphs = paragraphs.map((paragraph) => {
++    if (paragraph.trim() === "") {
++      return "";
++    }
++
++    const words = paragraph.split(/\s+/);
++    const lines = [];
++    let currentLine = "";
++
++    for (const word of words) {
++      if (word.length > width) {
++        if (currentLine) {
++          lines.push(currentLine);
++          currentLine = "";
++        }
++        for (let i = 0; i < word.length; i += width) {
++          lines.push(word.slice(i, i + width));
++        }
++      } else if (!currentLine) {
++        currentLine = word;
++      } else if (currentLine.length + 1 + word.length <= width) {
++        currentLine += " " + word;
++      } else {
++        lines.push(currentLine);
++        currentLine = word;
++      }
++    }
++
++    if (currentLine) {
++      lines.push(currentLine);
++    }
++
++    return lines.join("\n");
++  });
++
++  return wrappedParagraphs.join("\n");
+ }

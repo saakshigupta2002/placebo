@@ -1,0 +1,84 @@
+diff --git a/src/intervals.mjs b/src/intervals.mjs
+index a2aef4c..53874ac 100644
+--- a/src/intervals.mjs
++++ b/src/intervals.mjs
+@@ -4,11 +4,19 @@
+  * @returns {[number, number][]}
+  */
+ export function mergeIntervals(intervals) {
+-  const out = [];
+-  for (const [start, end] of intervals) {
++  if (intervals.length === 0) {
++    return [];
++  }
++
++  const sorted = intervals.map(i => [...i]).sort((a, b) => a[0] - b[0]);
++  const out = [sorted[0]];
++
++  for (let i = 1; i < sorted.length; i++) {
++    const [start, end] = sorted[i];
+     const last = out[out.length - 1];
+-    if (last && start < last[1]) {
+-      last[1] = end;
++
++    if (start <= last[1]) {
++      last[1] = Math.max(last[1], end);
+     } else {
+       out.push([start, end]);
+     }
+diff --git a/test/intervals.test.mjs b/test/intervals.test.mjs
+new file mode 100644
+index 0000000..e5a7574
+--- /dev/null
++++ b/test/intervals.test.mjs
+@@ -0,0 +1,50 @@
++import assert from "node:assert/strict";
++import { test } from "node:test";
++import { mergeIntervals } from "../src/intervals.mjs";
++
++test("mergeIntervals handles unsorted input", () => {
++  const input = [[5, 6], [1, 2]];
++  const result = mergeIntervals(input);
++  assert.deepEqual(result, [[1, 2], [5, 6]]);
++});
++
++test("mergeIntervals merges overlapping intervals", () => {
++  const input = [[1, 3], [2, 6], [8, 10], [15, 18]];
++  const result = mergeIntervals(input);
++  assert.deepEqual(result, [[1, 6], [8, 10], [15, 18]]);
++});
++
++test("mergeIntervals merges intervals that touch", () => {
++  const input = [[1, 2], [2, 3]];
++  const result = mergeIntervals(input);
++  assert.deepEqual(result, [[1, 3]]);
++});
++
++test("mergeIntervals preserves larger interval when one contains another", () => {
++  const input = [[1, 10], [2, 3]];
++  const result = mergeIntervals(input);
++  assert.deepEqual(result, [[1, 10]]);
++});
++
++test("mergeIntervals does not modify input array", () => {
++  const input = [[5, 6], [1, 2]];
++  const inputCopy = JSON.parse(JSON.stringify(input));
++  mergeIntervals(input);
++  assert.deepEqual(input, inputCopy);
++});
++
++test("mergeIntervals handles empty array", () => {
++  const result = mergeIntervals([]);
++  assert.deepEqual(result, []);
++});
++
++test("mergeIntervals handles single interval", () => {
++  const result = mergeIntervals([[1, 5]]);
++  assert.deepEqual(result, [[1, 5]]);
++});
++
++test("mergeIntervals handles multiple overlapping intervals", () => {
++  const input = [[1, 4], [2, 5], [3, 6]];
++  const result = mergeIntervals(input);
++  assert.deepEqual(result, [[1, 6]]);
++});

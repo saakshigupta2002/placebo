@@ -9,6 +9,7 @@ import {
   fmtP,
   fmtValue,
   interventionLine,
+  notesSummary,
   passCounts,
 } from "./format.js";
 
@@ -85,6 +86,9 @@ export function renderTerminal(t: TrialRecord, reportPath?: string): string {
       `  ${pad("", cols[0]!)}${crit ? pc.red(`treatment: ${fmt("treatment")}`) : `treatment: ${fmt("treatment")}`}`,
     );
   }
+  const noted = notesSummary(r.adverse.notes);
+  if (noted)
+    lines.push(`  ${pad("also noted", cols[0]!)}${pc.dim(`${noted} · info, not adverse`)}`);
   const iso = t.isolation;
   lines.push(
     `  ${pad("isolation", cols[0]!)}${iso.verified ? pc.green("verified") : pc.red("not verified")} ${pc.dim(`(${iso.mode} mode)`)}`,

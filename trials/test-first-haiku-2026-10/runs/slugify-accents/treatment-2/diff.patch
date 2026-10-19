@@ -1,0 +1,61 @@
+diff --git a/src/slugify.mjs b/src/slugify.mjs
+index 4d3417b..1383a86 100644
+--- a/src/slugify.mjs
++++ b/src/slugify.mjs
+@@ -4,5 +4,10 @@
+  * @returns {string}
+  */
+ export function slugify(title) {
+-  return title.toLowerCase().replace(/[^a-z0-9]/g, "-");
++  return title
++    .toLowerCase()
++    .normalize("NFD")
++    .replace(/[\u0300-\u036f]/g, "")
++    .replace(/[^a-z0-9]+/g, "-")
++    .replace(/^-+|-+$/g, "");
+ }
+diff --git a/test/slugify.test.mjs b/test/slugify.test.mjs
+new file mode 100644
+index 0000000..d359ed1
+--- /dev/null
++++ b/test/slugify.test.mjs
+@@ -0,0 +1,39 @@
++import assert from "node:assert/strict";
++import { test } from "node:test";
++import { slugify } from "../src/slugify.mjs";
++
++test("slugify returns lowercase", () => {
++  assert.equal(slugify("Hello World"), "hello-world");
++});
++
++test("slugify removes punctuation and replaces with single dash", () => {
++  assert.equal(slugify("Hello, World!"), "hello-world");
++});
++
++test("slugify removes leading and trailing dashes", () => {
++  assert.equal(slugify("--hello-world--"), "hello-world");
++});
++
++test("slugify preserves digits", () => {
++  assert.equal(slugify("Hello 123 World"), "hello-123-world");
++});
++
++test("slugify folds accented Latin letters to plain form", () => {
++  assert.equal(slugify("Crème Brûlée"), "creme-brulee");
++});
++
++test("slugify handles multiple spaces and punctuation", () => {
++  assert.equal(slugify("Hello   ,   World   !"), "hello-world");
++});
++
++test("slugify handles mixed accents and punctuation", () => {
++  assert.equal(slugify("Café & Naïve"), "cafe-naive");
++});
++
++test("slugify with only special characters returns empty string", () => {
++  assert.equal(slugify("!!!"), "");
++});
++
++test("slugify preserves underscores if they are word boundaries", () => {
++  assert.equal(slugify("hello_world"), "hello-world");
++});

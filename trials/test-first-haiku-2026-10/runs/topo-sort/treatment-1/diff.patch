@@ -1,0 +1,111 @@
+diff --git a/src/toposort.mjs b/src/toposort.mjs
+index 2c14f9b..fa71967 100644
+--- a/src/toposort.mjs
++++ b/src/toposort.mjs
+@@ -4,5 +4,105 @@
+  * @returns {string[]}
+  */
+ export function topoSort(graph) {
+-  throw new Error("not implemented");
++  // Collect all nodes (both keys and nodes that appear as dependencies)
++  const allNodes = new Set(Object.keys(graph));
++  for (const deps of Object.values(graph)) {
++    for (const dep of deps) {
++      allNodes.add(dep);
++    }
++  }
++
++  // Track in-degree (number of unresolved dependencies)
++  const inDegree = new Map();
++  const adjList = new Map();
++
++  for (const node of allNodes) {
++    inDegree.set(node, 0);
++    adjList.set(node, []);
++  }
++
++  // Build adjacency list and calculate in-degrees
++  for (const [node, deps] of Object.entries(graph)) {
++    inDegree.set(node, deps.length);
++    for (const dep of deps) {
++      if (!adjList.has(dep)) {
++        adjList.set(dep, []);
++      }
++      adjList.get(dep).push(node);
++    }
++  }
++
++  // Kahn's algorithm with alphabetical ordering
++  const queue = Array.from(allNodes)
++    .filter(node => inDegree.get(node) === 0)
++    .sort();
++
++  const result = [];
++  const visiting = new Set();
++  const visited = new Set();
++
++  while (queue.length > 0) {
++    // Sort queue alphabetically for deterministic output
++    queue.sort();
++    const node = queue.shift();
++
++    result.push(node);
++    visited.add(node);
++
++    // Process neighbors
++    const neighbors = adjList.get(node) || [];
++    const nextNodes = [];
++
++    for (const neighbor of neighbors) {
++      inDegree.set(neighbor, inDegree.get(neighbor) - 1);
++      if (inDegree.get(neighbor) === 0) {
++        nextNodes.push(neighbor);
++      }
++    }
++
++    // Add new ready nodes to queue in sorted order
++    queue.push(...nextNodes);
++  }
++
++  // Check if all nodes were visited (if not, there's a cycle)
++  if (visited.size !== allNodes.size) {
++    // Find the cycle using DFS
++    const visited2 = new Set();
++    const recStack = new Set();
++
++    function findCycle(node, path) {
++      visited2.add(node);
++      recStack.add(node);
++      path.push(node);
++
++      const deps = graph[node] || [];
++      for (const dep of deps) {
++        if (recStack.has(dep)) {
++          // Found a cycle
++          const cycleStart = path.indexOf(dep);
++          const cycle = path.slice(cycleStart).concat([dep]);
++          throw new Error(`cycle: ${cycle.join(' -> ')}`);
++        }
++        if (!visited2.has(dep)) {
++          findCycle(dep, path.slice());
++        }
++      }
++
++      recStack.delete(node);
++    }
++
++    for (const node of allNodes) {
++      if (!visited2.has(node)) {
++        try {
++          findCycle(node, []);
++        } catch (e) {
++          if (e.message.startsWith('cycle:')) {
++            throw e;
++          }
++        }
++      }
++    }
++  }
++
++  return result;
+ }

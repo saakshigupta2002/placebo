@@ -6,7 +6,8 @@
 // {
 //   "title": "placebo · sped up", "cols": 92, "rows": 20, "fontSize": 13, "lineHeight": 19, "holdMs": 4500,
 //   "steps": [
-//     { "cmd": "placebo trial ./skills/test-first --pack starter-js", "cps": 38 },
+//     { "cmd": "placebo trial ./skills/test-first \\", "cps": 38 },
+//     { "cmd": "--pack starter-js", "prompt": " ", "cps": 38 },   (continuation line)
 //     { "out": ["[b]Placebo[/] trial t_1", "[dim]  12 tasks[/]"], "gapMs": 90 },
 //     { "pauseMs": 600 }
 //   ]
@@ -64,7 +65,13 @@ for (const step of s.steps) {
     const cps = step.cps ?? 38;
     const start = t;
     const typing = (step.cmd.length / cps) * 1000;
-    lines.push({ kind: "cmd", text: step.cmd, t: start, typeEnd: start + typing });
+    lines.push({
+      kind: "cmd",
+      text: step.cmd,
+      t: start,
+      typeEnd: start + typing,
+      prompt: step.prompt ?? "$",
+    });
     t = start + typing + (step.afterMs ?? 350);
   } else if (step.out) {
     const gap = step.gapMs ?? 70;
@@ -115,8 +122,9 @@ lines.forEach((ln, i) => {
     }
     widths.push((steps * cw).toFixed(1), "0");
     times.push("0.996", "0.999");
+    const off = (ln.prompt.length + 1) * cw;
     defs.push(
-      `<clipPath id="${id}"><rect x="${padX + 2 * cw}" y="${y - lh + 5}" height="${lh}" width="0"><animate attributeName="width" calcMode="discrete" values="0;${widths.join(";")}" keyTimes="0;${times.join(";")}" dur="${total}ms" repeatCount="indefinite"/></rect></clipPath>`,
+      `<clipPath id="${id}"><rect x="${padX + off}" y="${y - lh + 5}" height="${lh}" width="0"><animate attributeName="width" calcMode="discrete" values="0;${widths.join(";")}" keyTimes="0;${times.join(";")}" dur="${total}ms" repeatCount="indefinite"/></rect></clipPath>`,
     );
     body.push(
       `<text x="${padX}" y="${y}" fill="${C.prompt}" font-weight="700" opacity="0">$${reveal(ln.t)}</text>`,
@@ -128,7 +136,7 @@ lines.forEach((ln, i) => {
     const xs = [];
     const cts = [];
     for (let k = 0; k <= steps; k++) {
-      xs.push((padX + (2 + k) * cw).toFixed(1));
+      xs.push((padX + off + k * cw).toFixed(1));
       cts.push(kt(ln.t + ((ln.typeEnd - ln.t) * k) / steps));
     }
     body.push(

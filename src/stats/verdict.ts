@@ -19,17 +19,25 @@ function significant(m: MetricResult | undefined): boolean {
 }
 
 /** How many tasks would shrink the widest confidence interval to the target margin. */
+/**
+ * Rough number of tasks that would settle the trial. Interval half-widths shrink with the square
+ * root of the task count, so for each deciding metric: if the observed effect is large, size the
+ * trial to tell that effect from zero; if it is near zero, size it to prove it is too small to
+ * matter. Any one metric settling is enough for a verdict, so take the smallest answer.
+ */
 function tasksNeeded(metrics: MetricResult[]): number | undefined {
-  let worst = 1;
-  let n = 0;
+  let best: number | undefined;
   for (const m of metrics) {
     if (m.key !== "pass" && m.key !== "cost" && m.key !== "tokens") continue;
     const half = (m.ciHigh - m.ciLow) / 2;
-    const target = m.unit === "points" ? PASS_MARGIN_POINTS / 2 : COST_MARGIN / 2;
-    if (half > 0) worst = Math.max(worst, (half / target) ** 2);
-    n = Math.max(n, m.n);
+    if (!(half > 0) || m.n === 0) continue;
+    const margin = m.unit === "points" ? PASS_MARGIN_POINTS : COST_MARGIN;
+    const size = Math.abs(m.effect);
+    const target = size > margin / 2 ? size : margin;
+    const needed = Math.ceil(m.n * (half / target) ** 2);
+    if (needed > m.n && (best === undefined || needed < best)) best = needed;
   }
-  return worst > 1 && n > 0 ? Math.ceil(n * worst) : undefined;
+  return best;
 }
 
 export interface VerdictInput {

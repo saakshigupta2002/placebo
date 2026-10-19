@@ -1,0 +1,76 @@
+diff --git a/src/wrap.mjs b/src/wrap.mjs
+index 829dd05..22249fd 100644
+--- a/src/wrap.mjs
++++ b/src/wrap.mjs
+@@ -5,5 +5,70 @@
+  * @returns {string}
+  */
+ export function wrap(text, width) {
+-  throw new Error("not implemented");
++  if (!Number.isInteger(width) || width <= 0) {
++    throw new RangeError("width must be a positive integer");
++  }
++
++  return text
++    .split("\n")
++    .map((line) => wrapLine(line, width))
++    .join("\n");
++}
++
++function wrapLine(line, width) {
++  // If line is empty (blank line), return it as-is
++  if (line.trim() === "") {
++    return "";
++  }
++
++  // Split by spaces and filter out empty strings (handles multiple spaces)
++  const words = line.split(/\s+/);
++
++  const result = [];
++  let currentLine = "";
++
++  for (const word of words) {
++    if (word === "") continue;
++
++    // If word fits on current line
++    if (currentLine.length === 0) {
++      // Starting a new line
++      if (word.length <= width) {
++        currentLine = word;
++      } else {
++        // Word is longer than width, split into chunks
++        let remaining = word;
++        while (remaining.length > width) {
++          result.push(remaining.substring(0, width));
++          remaining = remaining.substring(width);
++        }
++        currentLine = remaining;
++      }
++    } else if (currentLine.length + 1 + word.length <= width) {
++      // Word fits with a space
++      currentLine += " " + word;
++    } else {
++      // Word doesn't fit, save current line and start new one
++      result.push(currentLine);
++
++      if (word.length <= width) {
++        currentLine = word;
++      } else {
++        // Word is longer than width, split into chunks
++        let remaining = word;
++        while (remaining.length > width) {
++          result.push(remaining.substring(0, width));
++          remaining = remaining.substring(width);
++        }
++        currentLine = remaining;
++      }
++    }
++  }
++
++  // Add any remaining content
++  if (currentLine.length > 0) {
++    result.push(currentLine);
++  }
++
++  return result.join("\n");
+ }

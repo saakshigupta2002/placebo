@@ -1,0 +1,107 @@
+diff --git a/src/toposort.mjs b/src/toposort.mjs
+index 2c14f9b..556352d 100644
+--- a/src/toposort.mjs
++++ b/src/toposort.mjs
+@@ -4,5 +4,101 @@
+  * @returns {string[]}
+  */
+ export function topoSort(graph) {
+-  throw new Error("not implemented");
++  // Collect all nodes (both keys and dependencies)
++  const allNodes = new Set(Object.keys(graph));
++  for (const deps of Object.values(graph)) {
++    for (const dep of deps) {
++      allNodes.add(dep);
++    }
++  }
++
++  // Calculate in-degrees for each node
++  const inDegree = new Map();
++  for (const node of allNodes) {
++    inDegree.set(node, 0);
++  }
++
++  // Count incoming edges from each node's perspective
++  for (const [node, deps] of Object.entries(graph)) {
++    for (const dep of deps) {
++      inDegree.set(node, (inDegree.get(node) || 0) + 1);
++    }
++  }
++
++  // Start with nodes that have no dependencies
++  const queue = Array.from(allNodes)
++    .filter(node => inDegree.get(node) === 0)
++    .sort();
++
++  const result = [];
++
++  while (queue.length > 0) {
++    // Take next node in alphabetical order
++    queue.sort();
++    const node = queue.shift();
++    result.push(node);
++
++    // Find nodes that depend on this node
++    for (const [depNode, deps] of Object.entries(graph)) {
++      if (deps.includes(node)) {
++        inDegree.set(depNode, inDegree.get(depNode) - 1);
++        if (inDegree.get(depNode) === 0) {
++          queue.push(depNode);
++        }
++      }
++    }
++  }
++
++  // Check for cycle
++  if (result.length < allNodes.size) {
++    // Find cycle using DFS from unvisited nodes
++    const visited = new Set(result);
++    const remaining = Array.from(allNodes).filter(n => !visited.has(n));
++
++    const findCycle = () => {
++      for (const startNode of remaining) {
++        const path = [];
++        const visiting = new Set();
++
++        const dfs = (node) => {
++          if (path.includes(node)) {
++            // Found cycle - extract it
++            const cycleStart = path.indexOf(node);
++            return path.slice(cycleStart).concat([node]);
++          }
++          if (visiting.has(node)) {
++            return null;
++          }
++
++          visiting.add(node);
++          path.push(node);
++
++          for (const dep of (graph[node] || [])) {
++            const cycle = dfs(dep);
++            if (cycle) {
++              return cycle;
++            }
++          }
++
++          path.pop();
++          visiting.delete(node);
++          return null;
++        };
++
++        const cycle = dfs(startNode);
++        if (cycle) {
++          return cycle;
++        }
++      }
++      return null;
++    };
++
++    const cycle = findCycle();
++    if (cycle) {
++      const cycleStr = cycle.join(' -> ');
++      throw new Error(`cycle: ${cycleStr}`);
++    }
++  }
++
++  return result;
+ }

@@ -1,0 +1,29 @@
+diff --git a/src/intervals.mjs b/src/intervals.mjs
+index a2aef4c..39b693a 100644
+--- a/src/intervals.mjs
++++ b/src/intervals.mjs
+@@ -4,11 +4,20 @@
+  * @returns {[number, number][]}
+  */
+ export function mergeIntervals(intervals) {
+-  const out = [];
+-  for (const [start, end] of intervals) {
++  if (intervals.length === 0) {
++    return [];
++  }
++
++  // Sort by start position (create a copy to avoid mutating input)
++  const sorted = [...intervals].sort((a, b) => a[0] - b[0]);
++
++  const out = [sorted[0]];
++  for (let i = 1; i < sorted.length; i++) {
++    const [start, end] = sorted[i];
+     const last = out[out.length - 1];
+-    if (last && start < last[1]) {
+-      last[1] = end;
++    if (start <= last[1]) {
++      // Merge: extend the last interval's end if needed
++      last[1] = Math.max(last[1], end);
+     } else {
+       out.push([start, end]);
+     }

@@ -1,0 +1,83 @@
+diff --git a/src/lru.mjs b/src/lru.mjs
+index 943f96f..dca696b 100644
+--- a/src/lru.mjs
++++ b/src/lru.mjs
+@@ -2,6 +2,77 @@
+ export class LRUCache {
+   /** @param {number} capacity */
+   constructor(capacity) {
+-    throw new Error("not implemented");
++    if (!Number.isInteger(capacity) || capacity <= 0) {
++      throw new RangeError("capacity must be a positive integer");
++    }
++    this.capacity = capacity;
++    this.cache = new Map();
++  }
++
++  /**
++   * Get a value by key, marking it as recently used.
++   * @param {*} key
++   * @returns {*} The value, or undefined if not found
++   */
++  get(key) {
++    if (!this.cache.has(key)) {
++      return undefined;
++    }
++    const value = this.cache.get(key);
++    // Move to end (most recently used)
++    this.cache.delete(key);
++    this.cache.set(key, value);
++    return value;
++  }
++
++  /**
++   * Set a key-value pair, marking it as recently used.
++   * Evicts least recently used entry if capacity is exceeded.
++   * @param {*} key
++   * @param {*} value
++   * @returns {LRUCache} The cache instance for chaining
++   */
++  set(key, value) {
++    // If key already exists, remove it to update position
++    if (this.cache.has(key)) {
++      this.cache.delete(key);
++    }
++
++    // Add the new entry at the end (most recently used)
++    this.cache.set(key, value);
++
++    // Evict least recently used if over capacity
++    if (this.cache.size > this.capacity) {
++      const firstKey = this.cache.keys().next().value;
++      this.cache.delete(firstKey);
++    }
++
++    return this;
++  }
++
++  /**
++   * Check if a key exists (does not count as a use).
++   * @param {*} key
++   * @returns {boolean}
++   */
++  has(key) {
++    return this.cache.has(key);
++  }
++
++  /**
++   * Delete a key from the cache.
++   * @param {*} key
++   * @returns {boolean} Whether something was removed
++   */
++  delete(key) {
++    return this.cache.delete(key);
++  }
++
++  /**
++   * Get the current size of the cache.
++   * @returns {number}
++   */
++  get size() {
++    return this.cache.size;
+   }
+ }

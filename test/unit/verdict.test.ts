@@ -124,6 +124,23 @@ describe("verdict rules", () => {
     expect(v.headline).toMatch(/smallest possible p-value is 0.25/);
   });
 
+  it("sizes the estimate against a large observed effect, not a tiny margin", () => {
+    const m = [
+      { ...metric("pass", 0, 0, 0, 1), n: 6 },
+      { ...metric("cost", -0.237, -0.541, 0.236, 0.19), n: 6 },
+    ];
+    const v = decideVerdict({
+      kind: "skill-version",
+      metrics: m,
+      activation: { fired: 5, runs: 6, control: { fired: 5, runs: 6 } },
+      adverse: noAdverse,
+    });
+    expect(v.label).toBe("INCONCLUSIVE");
+    expect(v.tasksNeeded).toBeGreaterThan(6);
+    expect(v.tasksNeeded).toBeLessThan(40);
+    expect(v.headline).toMatch(/About \d+ tasks would settle it/);
+  });
+
   it("INCONCLUSIVE with an estimate of tasks needed", () => {
     const v = decideVerdict({
       kind: "skill",

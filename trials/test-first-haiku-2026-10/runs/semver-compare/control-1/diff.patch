@@ -1,0 +1,127 @@
+diff --git a/src/semver.mjs b/src/semver.mjs
+index 50d6770..8b47cea 100644
+--- a/src/semver.mjs
++++ b/src/semver.mjs
+@@ -3,5 +3,121 @@
+  * @returns {-1 | 0 | 1}
+  */
+ export function compareVersions(a, b) {
+-  throw new Error("not implemented");
++  const versionA = parseVersion(a);
++  const versionB = parseVersion(b);
++
++  // Compare major, minor, patch
++  if (versionA.major !== versionB.major) {
++    return versionA.major < versionB.major ? -1 : 1;
++  }
++  if (versionA.minor !== versionB.minor) {
++    return versionA.minor < versionB.minor ? -1 : 1;
++  }
++  if (versionA.patch !== versionB.patch) {
++    return versionA.patch < versionB.patch ? -1 : 1;
++  }
++
++  // Compare pre-release versions
++  // Version without pre-release > version with pre-release
++  if (versionA.prerelease.length === 0 && versionB.prerelease.length === 0) {
++    return 0;
++  }
++  if (versionA.prerelease.length === 0) {
++    return 1; // a is higher (no pre-release)
++  }
++  if (versionB.prerelease.length === 0) {
++    return -1; // b is higher (no pre-release)
++  }
++
++  // Compare pre-release identifiers
++  for (let i = 0; i < Math.max(versionA.prerelease.length, versionB.prerelease.length); i++) {
++    const identifierA = versionA.prerelease[i];
++    const identifierB = versionB.prerelease[i];
++
++    // Shorter pre-release is lower
++    if (identifierA === undefined) {
++      return -1;
++    }
++    if (identifierB === undefined) {
++      return 1;
++    }
++
++    const numA = Number.isInteger(identifierA) ? identifierA : null;
++    const numB = Number.isInteger(identifierB) ? identifierB : null;
++
++    // Both numeric: compare numerically
++    if (numA !== null && numB !== null) {
++      if (numA !== numB) {
++        return numA < numB ? -1 : 1;
++      }
++    }
++    // One numeric, one alphanumeric: numeric is lower
++    else if (numA !== null) {
++      return -1;
++    } else if (numB !== null) {
++      return 1;
++    }
++    // Both alphanumeric: compare in ASCII order
++    else {
++      if (identifierA !== identifierB) {
++        return identifierA < identifierB ? -1 : 1;
++      }
++    }
++  }
++
++  return 0;
++}
++
++function parseVersion(versionStr) {
++  if (typeof versionStr !== "string") {
++    throw new TypeError(`Invalid version: ${versionStr}`);
++  }
++
++  // Remove leading 'v' if present
++  let version = versionStr.startsWith("v") ? versionStr.slice(1) : versionStr;
++
++  // Split off build metadata (after +)
++  const [versionPart] = version.split("+");
++  version = versionPart;
++
++  // Split version and pre-release
++  const [baseVersion, prereleasePart] = version.split("-");
++
++  // Parse major.minor.patch
++  const parts = baseVersion.split(".");
++  if (parts.length !== 3) {
++    throw new TypeError(`Invalid version: ${versionStr}`);
++  }
++
++  const major = parseInt(parts[0], 10);
++  const minor = parseInt(parts[1], 10);
++  const patch = parseInt(parts[2], 10);
++
++  if (!Number.isFinite(major) || !Number.isFinite(minor) || !Number.isFinite(patch)) {
++    throw new TypeError(`Invalid version: ${versionStr}`);
++  }
++
++  if (major < 0 || minor < 0 || patch < 0) {
++    throw new TypeError(`Invalid version: ${versionStr}`);
++  }
++
++  // Parse pre-release identifiers
++  const prerelease = [];
++  if (prereleasePart) {
++    const identifiers = prereleasePart.split(".");
++    for (const id of identifiers) {
++      if (!id) {
++        throw new TypeError(`Invalid version: ${versionStr}`);
++      }
++      // Try to parse as integer, otherwise keep as string
++      const num = parseInt(id, 10);
++      if (Number.isInteger(num) && num.toString() === id) {
++        prerelease.push(num);
++      } else {
++        prerelease.push(id);
++      }
++    }
++  }
++
++  return { major, minor, patch, prerelease };
+ }

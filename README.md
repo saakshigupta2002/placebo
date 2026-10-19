@@ -21,7 +21,7 @@ Find out if a skill, a CLAUDE.md, a model or an agent actually helps on <i>your<
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/trial-card-dark.png">
-    <img src="docs/assets/trial-card-light.png" width="860" alt="A real Placebo trial card: verdict Inconclusive, tests passed 4/8 to 7/8, cost and time with 95% intervals, the skill fired in 1 of 8 runs, no adverse events, isolation verified">
+    <img src="docs/assets/trial-card-light.png" width="860" alt="A real Placebo trial card for the test-first skill on Claude Code with Haiku: verdict Harmful, costs 161% more with no gain in correctness. Tests passed 14/18 to 16/17, cost per task $0.03 to $0.07, time 22s to 48s, the skill fired in 16 of 17 runs, no adverse events, isolation verified">
   </picture>
 </p>
 
@@ -31,7 +31,8 @@ Agent skills are installed on the strength of stars and promises. Almost nobody 
 
 - One of the most-starred token-saving skills advertises **65% fewer tokens**. An independent paired test [measured **8.5%**](https://blog.jetbrains.com/ai/2026/07/speak-to-ai-agents-like-cavemen-tosave-tokens/) and called that the ceiling.
 - Another viral skill claims **54% less code**. A [test over 80 paired tasks](https://blog.jetbrains.com/ai/2026/07/ponytail-skill-claude-tested/) found **15%**, with no change at all on small tasks.
-- Installed passively, that same skill [**never activated**](https://dev.to/yashddesai/ponytail-the-ai-coding-skill-taking-github-by-storm-and-the-one-question-nobodys-answered-yet-46mc) in independent tests. Guides report that even good skills fire [about half the time](https://conduction.nl/academy/claude-skills-tutorial-3-skill-evals).
+- In our own trial, a "keep messages short" skill that says to use it for every coding task **fired in 1 of 8 runs**. The card above is another real trial: a "read the tests first" skill that fired almost every time and **cost 161% more for no gain**.
+- Installed passively, the 54% skill [**never activated**](https://dev.to/yashddesai/ponytail-the-ai-coding-skill-taking-github-by-storm-and-the-one-question-nobodys-answered-yet-46mc) in independent tests. Guides report that even good skills fire [about half the time](https://conduction.nl/academy/claude-skills-tutorial-3-skill-evals).
 
 **Placebo runs the experiment for you.** It takes real fixes from your own git history and hands each one to your agent twice, in two sealed copies of your repo: once with the skill, once without. Your own tests grade both attempts. Paired statistics give one of four verdicts: **Works**, **Placebo**, **Harmful** or **Inconclusive**. Along the way it records whether the skill even switched on and whether it made your agent do anything it should not.
 
@@ -51,26 +52,13 @@ npx placebo-cli trial ./path/to/skill         # or a GitHub URL to a skill folde
 
 You get a table in the terminal, a self-contained `report.html` (the card above), a `trial.json` with every number and a `REPORT.md` ready for a PR or README.
 
-```text
-  Placebo · trial t_584ece · 4 tasks × 2 arms × 2 repeats · claude-code 2.1.25 / haiku
-  Testing skill "terse" (sha 501489f9)
+## See it in action
 
-                    control     treatment    effect (95% CI)           p
-  tests passed      4/8         7/8          +38 pts  (0, +100)        0.500
-  tokens / task     461.8k      496.0k       +7.5%  (-2.1, +14.4)      0.250
-  cost / task       $0.11       $0.11        +10.6%  (-12.0, +68.4)    0.750
-  time / task       1m12s       1m14s        +2.1%  (-14.7, +17.3)     0.875
-  lines changed     11          12           -4.1%  (-62.5, +333.3)    1.000
-  skill fired       -           1/8 runs (13%)
+<p align="center">
+  <img src="docs/assets/demo-terminal.svg" width="900" alt="Animated terminal: a real Placebo trial of the test-first skill on Claude Code with Haiku. Runs tick past, isolation is verified and the verdict is Harmful: it costs 161% more with no gain in correctness.">
+</p>
 
-  adverse events    none
-  isolation         verified (flags mode)
-  errored runs      8 (excluded from statistics)
-
-  VERDICT  INCONCLUSIVE  Too few tasks to judge. With 4 tasks the smallest possible p-value is 0.13; run at least 6, ideally 15 or more.
-```
-
-<sub>A real trial, the same one as the card above: a "keep messages short" skill on tasks mined from the history of <a href="https://github.com/unjs/ufo">unjs/ufo</a>, Claude Code on Haiku. The skill's description says to use it for every coding task, yet it <b>fired in 1 of 8 runs</b>. The agent hit its plan's usage limit after four tasks, so Placebo excluded the errored runs, refused to call a winner on four tasks and offered <code>placebo trial --resume t_584ece</code> for later.</sub>
+<sub>A real run, sped up. The output is copied line for line from trial <code>t_launch1</code>: a "read the tests first" skill on the bundled starter pack, Claude Code with Haiku. The full record, including the exact skill and every run's diff, is in <a href="trials/test-first-haiku-2026-10">trials/test-first-haiku-2026-10</a>. Placebo stopped by itself after 8 tasks once the cost difference was settled (p = 0.004). The whole trial cost $1.69.</sub>
 
 ## How it works
 

@@ -155,8 +155,10 @@ export interface TrialResults {
     /** Runs with at least one critical event, per arm. */
     criticalControl: number;
     criticalTreatment: number;
-    /** Event counts by kind, per arm. */
+    /** Warning and critical event counts by kind (runs affected), per arm. */
     events: Record<string, { control: number; treatment: number }>;
+    /** Informational notes by kind (runs affected): recorded, never counted as adverse. */
+    notes?: Record<string, { control: number; treatment: number }>;
   };
   verdict: Verdict;
 }

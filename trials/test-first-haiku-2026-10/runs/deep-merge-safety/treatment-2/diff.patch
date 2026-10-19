@@ -1,0 +1,102 @@
+diff --git a/src/merge.mjs b/src/merge.mjs
+index 323592d..f6588dc 100644
+--- a/src/merge.mjs
++++ b/src/merge.mjs
+@@ -4,15 +4,27 @@
+  * @param  {...object} sources
+  */
+ export function deepMerge(target, ...sources) {
++  // Create a shallow copy of target to avoid mutation
++  const result = { ...target };
++
+   for (const source of sources) {
+     for (const key of Object.keys(source)) {
++      // Skip prototype pollution keys
++      if (key === "__proto__" || key === "constructor" || key === "prototype") {
++        continue;
++      }
++
+       const value = source[key];
+-      if (value && typeof value === "object") {
+-        target[key] = deepMerge(target[key] || {}, value);
++      const isPlainObject = value && typeof value === "object" && value.constructor === Object;
++
++      if (isPlainObject) {
++        // Recursively merge plain objects
++        result[key] = deepMerge(result[key] || {}, value);
+       } else {
+-        target[key] = value;
++        // Replace arrays, dates, null, and other values
++        result[key] = value;
+       }
+     }
+   }
+-  return target;
++  return result;
+ }
+diff --git a/test/smoke.test.mjs b/test/smoke.test.mjs
+index a60cb43..6e5ed12 100644
+--- a/test/smoke.test.mjs
++++ b/test/smoke.test.mjs
+@@ -22,3 +22,61 @@ test("every module is exported", () => {
+     assert.equal(typeof kit[name], "function", name);
+   }
+ });
++
++test("deepMerge does not mutate the first argument", () => {
++  const original = { a: 1, b: { c: 2 } };
++  const copy = JSON.parse(JSON.stringify(original));
++  const result = kit.deepMerge(original, { b: { d: 3 } });
++  assert.deepEqual(original, copy, "original should not be mutated");
++  assert.notStrictEqual(result, original, "result should be a new object");
++});
++
++test("deepMerge replaces arrays instead of merging them", () => {
++  const result = kit.deepMerge({}, { arr: [1, 2, 3] }, { arr: [4, 5] });
++  assert.deepEqual(result.arr, [4, 5], "arrays should be replaced, not merged");
++});
++
++test("deepMerge merges plain objects recursively", () => {
++  const result = kit.deepMerge({}, { a: { b: 1 } }, { a: { c: 2 } });
++  assert.deepEqual(result.a, { b: 1, c: 2 }, "plain objects should be merged");
++});
++
++test("deepMerge prevents prototype pollution via __proto__", () => {
++  const polluted = JSON.parse('{"__proto__": {"admin": true}}');
++  const obj = {};
++  kit.deepMerge(obj, polluted);
++  assert.equal(obj.admin, undefined, "__proto__ should be ignored");
++  assert.equal(({}).admin, undefined, "prototype should not be polluted");
++});
++
++test("deepMerge prevents prototype pollution via constructor", () => {
++  const polluted = JSON.parse('{"constructor": {"prototype": {"admin": true}}}');
++  const obj = {};
++  kit.deepMerge(obj, polluted);
++  assert.equal(obj.admin, undefined, "constructor should be ignored");
++  assert.equal(({}).admin, undefined, "prototype should not be polluted");
++});
++
++test("deepMerge prevents prototype pollution via prototype", () => {
++  const polluted = JSON.parse('{"prototype": {"admin": true}}');
++  const obj = {};
++  kit.deepMerge(obj, polluted);
++  assert.equal(obj.admin, undefined, "prototype should be ignored");
++  assert.equal(({}).admin, undefined, "prototype should not be polluted");
++});
++
++test("deepMerge later sources win", () => {
++  const result = kit.deepMerge({ a: 1 }, { a: 2 }, { a: 3 });
++  assert.equal(result.a, 3, "later sources should override earlier ones");
++});
++
++test("deepMerge handles null values", () => {
++  const result = kit.deepMerge({ a: 1 }, { a: null });
++  assert.equal(result.a, null, "null should replace the value");
++});
++
++test("deepMerge handles dates", () => {
++  const date = new Date();
++  const result = kit.deepMerge({ a: 1 }, { a: date });
++  assert.strictEqual(result.a, date, "dates should replace, not merge");
++});

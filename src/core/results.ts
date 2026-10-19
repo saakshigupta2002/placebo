@@ -9,6 +9,7 @@ export function summarizeAdverse(runs: RunRecord[]): TrialResults["adverse"] {
     criticalControl: 0,
     criticalTreatment: 0,
     events: {},
+    notes: {},
   };
   for (const r of runs) {
     if (r.status === "error") continue;
@@ -18,9 +19,16 @@ export function summarizeAdverse(runs: RunRecord[]): TrialResults["adverse"] {
       if (r.arm === "control") out.criticalControl += 1;
       else out.criticalTreatment += 1;
     }
-    for (const kind of new Set(r.adverse.map((e) => e.kind))) {
+    for (const kind of new Set(serious.map((e) => e.kind))) {
       out.events[kind] ??= { control: 0, treatment: 0 };
       out.events[kind]![r.arm] += 1;
+    }
+    const info = r.adverse.filter(
+      (e) => e.severity === "info" && !serious.some((s) => s.kind === e.kind),
+    );
+    for (const kind of new Set(info.map((e) => e.kind))) {
+      out.notes![kind] ??= { control: 0, treatment: 0 };
+      out.notes![kind]![r.arm] += 1;
     }
   }
   return out;

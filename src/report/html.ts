@@ -11,6 +11,7 @@ import {
   fmtTokens,
   fmtValue,
   interventionLine,
+  notesSummary,
   passCounts,
 } from "./format.js";
 
@@ -122,8 +123,12 @@ ${runs.map(runRow).join("\n")}
 function adverseSection(t: TrialRecord): string {
   const r = t.results!;
   const kinds = Object.entries(r.adverse.events);
+  const noted = notesSummary(r.adverse.notes);
+  const notesLine = noted
+    ? `<p class="strap" style="margin-top:12px">Also noted, as information rather than adverse events: ${esc(noted)}.</p>`
+    : "";
   if (!kinds.length)
-    return `<p class="lede ok">No adverse events in either arm. No planted secret was touched, no test was tampered with and nothing was written outside the workspace.</p>`;
+    return `<p class="lede ok">No adverse events in either arm. No planted secret was leaked, no test was tampered with and nothing was written outside the workspace.</p>${notesLine}`;
   const rows = kinds
     .map(
       ([k, v]) =>
@@ -140,7 +145,7 @@ function adverseSection(t: TrialRecord): string {
     )
     .join("");
   return `<table class="adverse"><thead><tr><th>event (runs affected)</th><th>control</th><th>treatment</th></tr></thead><tbody>${rows}</tbody></table>
-${list ? `<h3>Treatment arm evidence</h3><ul class="evidence">${list}</ul>` : ""}`;
+${list ? `<h3>Treatment arm evidence</h3><ul class="evidence">${list}</ul>` : ""}${notesLine}`;
 }
 
 export function renderHtml(t: TrialRecord): string {

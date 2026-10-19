@@ -1,0 +1,91 @@
+diff --git a/src/csv.mjs b/src/csv.mjs
+index b361b5c..119c298 100644
+--- a/src/csv.mjs
++++ b/src/csv.mjs
+@@ -4,8 +4,82 @@
+  * @returns {string[][]}
+  */
+ export function parseCSV(text) {
+-  return text
+-    .split("\n")
+-    .filter((line) => line.length > 0)
+-    .map((line) => line.split(","));
++  const rows = [];
++  let currentRow = [];
++  let currentField = "";
++  let inQuotes = false;
++  let i = 0;
++
++  while (i < text.length) {
++    const char = text[i];
++
++    if (inQuotes) {
++      if (char === '"') {
++        // Check if it's an escaped quote (doubled quote)
++        if (i + 1 < text.length && text[i + 1] === '"') {
++          currentField += '"';
++          i += 2;
++          continue;
++        } else {
++          // End of quoted field
++          inQuotes = false;
++          i++;
++          continue;
++        }
++      } else {
++        currentField += char;
++        i++;
++        continue;
++      }
++    }
++
++    // Not in quotes
++    if (char === '"') {
++      inQuotes = true;
++      i++;
++      continue;
++    }
++
++    if (char === ",") {
++      currentRow.push(currentField);
++      currentField = "";
++      i++;
++      continue;
++    }
++
++    if (char === "\n" || (char === "\r" && i + 1 < text.length && text[i + 1] === "\n")) {
++      currentRow.push(currentField);
++      currentField = "";
++      if (currentRow.length > 0 || currentRow[0] !== "") {
++        rows.push(currentRow);
++        currentRow = [];
++      }
++      // Skip \r\n as a unit, or just \n
++      i += char === "\r" ? 2 : 1;
++      continue;
++    }
++
++    if (char === "\r") {
++      // Lone \r (old Mac line ending)
++      currentRow.push(currentField);
++      currentField = "";
++      if (currentRow.length > 0 || currentRow[0] !== "") {
++        rows.push(currentRow);
++        currentRow = [];
++      }
++      i++;
++      continue;
++    }
++
++    currentField += char;
++    i++;
++  }
++
++  // Add the last field and row if there's content
++  currentRow.push(currentField);
++  if (currentRow.length > 0 && !(currentRow.length === 1 && currentRow[0] === "")) {
++    rows.push(currentRow);
++  }
++
++  return rows;
+ }

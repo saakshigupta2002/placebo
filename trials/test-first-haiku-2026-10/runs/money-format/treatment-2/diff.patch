@@ -1,0 +1,88 @@
+diff --git a/src/money.mjs b/src/money.mjs
+index 164b8db..d7348b8 100644
+--- a/src/money.mjs
++++ b/src/money.mjs
+@@ -1,4 +1,5 @@
+ const SYMBOLS = { USD: "$", EUR: "€", GBP: "£", JPY: "¥" };
++const NO_DECIMAL_CURRENCIES = new Set(["JPY"]);
+ 
+ /**
+  * Format integer cents as money, e.g. 123456 -> "$1,234.56".
+@@ -6,7 +7,25 @@ const SYMBOLS = { USD: "$", EUR: "€", GBP: "£", JPY: "¥" };
+  * @param {string} currency
+  */
+ export function formatMoney(cents, currency = "USD") {
++  if (!Number.isInteger(cents)) {
++    throw new TypeError("cents must be an integer");
++  }
++
+   const symbol = SYMBOLS[currency] ?? `${currency} `;
+-  const amount = (cents / 100).toFixed(2);
+-  return symbol + amount;
++  const isNegative = cents < 0;
++  const absCents = Math.abs(cents);
++
++  let amount;
++  if (NO_DECIMAL_CURRENCIES.has(currency)) {
++    // For currencies with no minor unit, the input is already in whole units
++    amount = absCents.toString();
++  } else {
++    amount = (absCents / 100).toFixed(2);
++  }
++
++  // Add thousands separators
++  amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
++
++  const result = symbol + amount;
++  return isNegative ? "-" + result : result;
+ }
+diff --git a/test/money.test.mjs b/test/money.test.mjs
+new file mode 100644
+index 0000000..fba7baa
+--- /dev/null
++++ b/test/money.test.mjs
+@@ -0,0 +1,44 @@
++import assert from "node:assert/strict";
++import { test } from "node:test";
++import { formatMoney } from "../src/money.mjs";
++
++test("formatMoney basic USD", () => {
++  assert.equal(formatMoney(100, "USD"), "$1.00");
++  assert.equal(formatMoney(5000, "USD"), "$50.00");
++});
++
++test("formatMoney with thousands separators", () => {
++  assert.equal(formatMoney(123456789, "USD"), "$1,234,567.89");
++  assert.equal(formatMoney(100000, "USD"), "$1,000.00");
++  assert.equal(formatMoney(1000000, "USD"), "$10,000.00");
++});
++
++test("formatMoney negative amounts", () => {
++  assert.equal(formatMoney(-500, "USD"), "-$5.00");
++  assert.equal(formatMoney(-123456789, "USD"), "-$1,234,567.89");
++});
++
++test("formatMoney JPY without decimals", () => {
++  assert.equal(formatMoney(1500, "JPY"), "¥1,500");
++  assert.equal(formatMoney(100000, "JPY"), "¥100,000");
++});
++
++test("formatMoney EUR", () => {
++  assert.equal(formatMoney(100, "EUR"), "€1.00");
++  assert.equal(formatMoney(1234567, "EUR"), "€12,345.67");
++});
++
++test("formatMoney GBP", () => {
++  assert.equal(formatMoney(100, "GBP"), "£1.00");
++  assert.equal(formatMoney(5000, "GBP"), "£50.00");
++});
++
++test("formatMoney unknown currency", () => {
++  assert.equal(formatMoney(100, "XYZ"), "XYZ 1.00");
++  assert.equal(formatMoney(123456, "ABC"), "ABC 1,234.56");
++});
++
++test("formatMoney non-integer cents throws TypeError", () => {
++  assert.throws(() => formatMoney(10.5, "USD"), TypeError);
++  assert.throws(() => formatMoney(100.1, "USD"), TypeError);
++});

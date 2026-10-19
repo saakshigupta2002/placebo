@@ -1,0 +1,143 @@
+diff --git a/src/csv.mjs b/src/csv.mjs
+index b361b5c..85a2782 100644
+--- a/src/csv.mjs
++++ b/src/csv.mjs
+@@ -4,8 +4,69 @@
+  * @returns {string[][]}
+  */
+ export function parseCSV(text) {
+-  return text
+-    .split("\n")
+-    .filter((line) => line.length > 0)
+-    .map((line) => line.split(","));
++  const rows = [];
++  let currentRow = [];
++  let currentField = "";
++  let inQuotes = false;
++  let i = 0;
++
++  while (i < text.length) {
++    const char = text[i];
++
++    if (inQuotes) {
++      if (char === '"') {
++        // Check if it's an escaped quote (doubled quote)
++        if (i + 1 < text.length && text[i + 1] === '"') {
++          currentField += '"';
++          i += 2;
++        } else {
++          // End of quoted field
++          inQuotes = false;
++          i++;
++        }
++      } else {
++        currentField += char;
++        i++;
++      }
++    } else {
++      if (char === '"') {
++        // Start of quoted field
++        inQuotes = true;
++        i++;
++      } else if (char === ",") {
++        // Field separator
++        currentRow.push(currentField);
++        currentField = "";
++        i++;
++      } else if (char === "\n") {
++        // Line break (handle both \n and \r\n)
++        if (i > 0 && text[i - 1] === "\r") {
++          // Remove the \r that was added to currentField
++          currentField = currentField.slice(0, -1);
++        }
++        if (currentField.length > 0 || currentRow.length > 0) {
++          currentRow.push(currentField);
++          rows.push(currentRow);
++          currentRow = [];
++          currentField = "";
++        }
++        i++;
++      } else if (char === "\r") {
++        // Carriage return (part of \r\n)
++        currentField += char;
++        i++;
++      } else {
++        currentField += char;
++        i++;
++      }
++    }
++  }
++
++  // Add the last field and row if there's any content
++  if (currentField.length > 0 || currentRow.length > 0) {
++    currentRow.push(currentField);
++    rows.push(currentRow);
++  }
++
++  return rows;
+ }
+diff --git a/test/csv.test.mjs b/test/csv.test.mjs
+new file mode 100644
+index 0000000..cdd7205
+--- /dev/null
++++ b/test/csv.test.mjs
+@@ -0,0 +1,59 @@
++import assert from "node:assert/strict";
++import { test } from "node:test";
++import { parseCSV } from "../src/csv.mjs";
++
++test("parseCSV - simple fields without quotes", () => {
++  const result = parseCSV("a,b,c");
++  assert.deepEqual(result, [["a", "b", "c"]]);
++});
++
++test("parseCSV - quoted field with comma", () => {
++  const result = parseCSV('"a,b",c,d');
++  assert.deepEqual(result, [["a,b", "c", "d"]]);
++});
++
++test("parseCSV - escaped quotes (doubled quotes)", () => {
++  const result = parseCSV('"a""b",c');
++  assert.deepEqual(result, [["a\"b", "c"]]);
++});
++
++test("parseCSV - quoted field with line break", () => {
++  const result = parseCSV('"line1\nline2",c');
++  assert.deepEqual(result, [["line1\nline2", "c"]]);
++});
++
++test("parseCSV - Windows line endings", () => {
++  const result = parseCSV("a,b,c\r\n");
++  assert.deepEqual(result, [["a", "b", "c"]]);
++});
++
++test("parseCSV - empty fields preserved", () => {
++  const result = parseCSV("a,,c");
++  assert.deepEqual(result, [["a", "", "c"]]);
++});
++
++test("parseCSV - trailing newline produces no extra row", () => {
++  const result = parseCSV("a,b\n");
++  assert.deepEqual(result, [["a", "b"]]);
++});
++
++test("parseCSV - multiple rows", () => {
++  const result = parseCSV("a,b\nc,d");
++  assert.deepEqual(result, [["a", "b"], ["c", "d"]]);
++});
++
++test("parseCSV - complex: quoted field with comma and quotes across multiple rows", () => {
++  const result = parseCSV('"John ""Johnny"" Doe",30\n"Jane, Smith",25');
++  assert.deepEqual(result, [
++    ["John \"Johnny\" Doe", "30"],
++    ["Jane, Smith", "25"],
++  ]);
++});
++
++test("parseCSV - Windows line endings with quoted fields", () => {
++  const result = parseCSV('"a,b",c\r\n"d,e",f\r\n');
++  assert.deepEqual(result, [
++    ["a,b", "c"],
++    ["d,e", "f"],
++  ]);
++});

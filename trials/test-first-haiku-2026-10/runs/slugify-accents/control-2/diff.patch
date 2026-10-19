@@ -1,0 +1,16 @@
+diff --git a/src/slugify.mjs b/src/slugify.mjs
+index 4d3417b..1383a86 100644
+--- a/src/slugify.mjs
++++ b/src/slugify.mjs
+@@ -4,5 +4,10 @@
+  * @returns {string}
+  */
+ export function slugify(title) {
+-  return title.toLowerCase().replace(/[^a-z0-9]/g, "-");
++  return title
++    .toLowerCase()
++    .normalize("NFD")
++    .replace(/[\u0300-\u036f]/g, "")
++    .replace(/[^a-z0-9]+/g, "-")
++    .replace(/^-+|-+$/g, "");
+ }

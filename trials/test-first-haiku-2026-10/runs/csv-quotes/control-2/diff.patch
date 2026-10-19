@@ -1,0 +1,86 @@
+diff --git a/src/csv.mjs b/src/csv.mjs
+index b361b5c..d9c379d 100644
+--- a/src/csv.mjs
++++ b/src/csv.mjs
+@@ -4,8 +4,77 @@
+  * @returns {string[][]}
+  */
+ export function parseCSV(text) {
+-  return text
+-    .split("\n")
+-    .filter((line) => line.length > 0)
+-    .map((line) => line.split(","));
++  const rows = [];
++  let currentRow = [];
++  let currentField = "";
++  let insideQuotes = false;
++  let i = 0;
++
++  while (i < text.length) {
++    const char = text[i];
++
++    if (insideQuotes) {
++      if (char === '"') {
++        // Check if it's an escaped quote (doubled quote)
++        if (text[i + 1] === '"') {
++          currentField += '"';
++          i += 2;
++          continue;
++        } else {
++          // End of quoted field
++          insideQuotes = false;
++          i++;
++          continue;
++        }
++      } else {
++        currentField += char;
++        i++;
++        continue;
++      }
++    }
++
++    // Not inside quotes
++    if (char === '"') {
++      insideQuotes = true;
++      i++;
++      continue;
++    }
++
++    if (char === ",") {
++      currentRow.push(currentField);
++      currentField = "";
++      i++;
++      continue;
++    }
++
++    if (char === "\n") {
++      // Handle both \n and \r\n line endings
++      if (currentField.endsWith("\r")) {
++        currentField = currentField.slice(0, -1);
++      }
++      if (currentRow.length > 0 || currentField.length > 0) {
++        currentRow.push(currentField);
++        rows.push(currentRow);
++        currentRow = [];
++        currentField = "";
++      }
++      i++;
++      continue;
++    }
++
++    currentField += char;
++    i++;
++  }
++
++  // Add the last field and row if there's content
++  if (currentField.length > 0 || currentRow.length > 0) {
++    // Remove stray \r if present (Windows line ending at EOF)
++    if (currentField.endsWith("\r")) {
++      currentField = currentField.slice(0, -1);
++    }
++    currentRow.push(currentField);
++    rows.push(currentRow);
++  }
++
++  return rows;
+ }

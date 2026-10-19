@@ -1,0 +1,87 @@
+diff --git a/src/merge.mjs b/src/merge.mjs
+index 323592d..031ea6f 100644
+--- a/src/merge.mjs
++++ b/src/merge.mjs
+@@ -1,14 +1,35 @@
+ /**
+  * Deep-merge plain objects. Later sources win.
++ * Only plain objects are merged recursively. Arrays, dates, and null replace.
+  * @param {object} target
+  * @param  {...object} sources
+  */
+ export function deepMerge(target, ...sources) {
++  // Clone target to avoid mutation
++  target = JSON.parse(JSON.stringify(target));
++
+   for (const source of sources) {
+     for (const key of Object.keys(source)) {
++      // Skip prototype pollution keys
++      if (key === "__proto__" || key === "constructor" || key === "prototype") {
++        continue;
++      }
++
+       const value = source[key];
+-      if (value && typeof value === "object") {
+-        target[key] = deepMerge(target[key] || {}, value);
++      const targetValue = target[key];
++
++      // Only recursively merge if both are plain objects (not arrays, null, or other types)
++      if (
++        value &&
++        typeof value === "object" &&
++        !Array.isArray(value) &&
++        Object.getPrototypeOf(value) === Object.prototype &&
++        targetValue &&
++        typeof targetValue === "object" &&
++        !Array.isArray(targetValue) &&
++        Object.getPrototypeOf(targetValue) === Object.prototype
++      ) {
++        target[key] = deepMerge(targetValue, value);
+       } else {
+         target[key] = value;
+       }
+diff --git a/test_merge.mjs b/test_merge.mjs
+new file mode 100644
+index 0000000..2e1793f
+--- /dev/null
++++ b/test_merge.mjs
+@@ -0,0 +1,39 @@
++import { deepMerge } from './src/merge.mjs';
++
++// Test 1: No mutation of first argument
++console.log("Test 1: No mutation of first argument");
++const original = { a: 1, b: { c: 2 } };
++const originalCopy = JSON.parse(JSON.stringify(original));
++const result = deepMerge(original, { b: { d: 3 } });
++console.log("Original unchanged:", JSON.stringify(original) === JSON.stringify(originalCopy));
++console.log("Result has merge:", JSON.stringify(result));
++
++// Test 2: Arrays replace, don't merge
++console.log("\nTest 2: Arrays replace, don't merge");
++const obj1 = { arr: [1, 2, 3] };
++const obj1Copy = JSON.parse(JSON.stringify(obj1));
++const result2 = deepMerge(obj1Copy, { arr: [4, 5] });
++console.log("Array replaced:", JSON.stringify(result2.arr) === JSON.stringify([4, 5]));
++console.log("Array value:", result2.arr);
++
++// Test 3: Prototype pollution prevention
++console.log("\nTest 3: Prototype pollution prevention");
++const obj2 = {};
++const polluted = JSON.parse('{"__proto__": {"admin": true}}');
++const result3 = deepMerge(obj2, polluted);
++console.log("No pollution on Object.prototype:", Object.prototype.admin === undefined);
++console.log("Result doesn't have admin key:", result3.admin === undefined);
++
++// Test 4: Constructor and prototype keys are skipped
++console.log("\nTest 4: Constructor and prototype keys are skipped");
++const obj3 = { a: 1 };
++const result4 = deepMerge(obj3, { constructor: { vulnerable: true }, prototype: { also: true } });
++console.log("Constructor skipped:", result4.constructor === Object);
++console.log("Prototype skipped:", result4.prototype === undefined);
++
++// Test 5: Plain objects merge recursively
++console.log("\nTest 5: Plain objects merge recursively");
++const obj4 = { a: { b: { c: 1 } } };
++const obj4Copy = JSON.parse(JSON.stringify(obj4));
++const result5 = deepMerge(obj4Copy, { a: { b: { d: 2 } } });
++console.log("Nested merge works:", JSON.stringify(result5));

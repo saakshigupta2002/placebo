@@ -1,0 +1,101 @@
+diff --git a/src/semver.mjs b/src/semver.mjs
+index 50d6770..c6d4da9 100644
+--- a/src/semver.mjs
++++ b/src/semver.mjs
+@@ -3,5 +3,95 @@
+  * @returns {-1 | 0 | 1}
+  */
+ export function compareVersions(a, b) {
+-  throw new Error("not implemented");
++  const parseVersion = (version) => {
++    if (typeof version !== 'string') {
++      throw new TypeError('Version must be a string');
++    }
++
++    // Allow optional leading 'v'
++    let v = version.startsWith('v') ? version.slice(1) : version;
++
++    // Remove build metadata (after +)
++    const [corePart, _buildMetadata] = v.split('+');
++    v = corePart;
++
++    // Split into version and pre-release
++    const [versionPart, prereleasePart] = v.split('-');
++
++    // Validate and parse version numbers
++    const versionMatch = versionPart.match(/^(\d+)\.(\d+)\.(\d+)$/);
++    if (!versionMatch) {
++      throw new TypeError(`Invalid version format: ${version}`);
++    }
++
++    const major = parseInt(versionMatch[1], 10);
++    const minor = parseInt(versionMatch[2], 10);
++    const patch = parseInt(versionMatch[3], 10);
++
++    // Parse pre-release identifiers
++    let prerelease = [];
++    if (prereleasePart) {
++      prerelease = prereleasePart.split('.');
++      if (prerelease.some(id => id === '')) {
++        throw new TypeError(`Invalid pre-release format: ${version}`);
++      }
++    }
++
++    return { major, minor, patch, prerelease };
++  };
++
++  const compareIdentifiers = (a, b) => {
++    const aIsNum = /^\d+$/.test(a);
++    const bIsNum = /^\d+$/.test(b);
++
++    if (aIsNum && bIsNum) {
++      return parseInt(a, 10) - parseInt(b, 10);
++    }
++
++    if (aIsNum) return -1; // numeric identifiers rank below alphanumeric
++    if (bIsNum) return 1;
++
++    return a.localeCompare(b); // ASCII order
++  };
++
++  const versionA = parseVersion(a);
++  const versionB = parseVersion(b);
++
++  // Compare major.minor.patch
++  if (versionA.major !== versionB.major) {
++    return versionA.major < versionB.major ? -1 : 1;
++  }
++  if (versionA.minor !== versionB.minor) {
++    return versionA.minor < versionB.minor ? -1 : 1;
++  }
++  if (versionA.patch !== versionB.patch) {
++    return versionA.patch < versionB.patch ? -1 : 1;
++  }
++
++  // Compare pre-release versions
++  const aHasPrerelease = versionA.prerelease.length > 0;
++  const bHasPrerelease = versionB.prerelease.length > 0;
++
++  if (!aHasPrerelease && !bHasPrerelease) {
++    return 0;
++  }
++
++  if (!aHasPrerelease) return 1;  // release version > pre-release
++  if (!bHasPrerelease) return -1; // pre-release < release version
++
++  // Both have pre-release, compare identifier by identifier
++  const maxLen = Math.max(versionA.prerelease.length, versionB.prerelease.length);
++  for (let i = 0; i < maxLen; i++) {
++    if (i >= versionA.prerelease.length) {
++      return -1; // shorter prerelease is lower
++    }
++    if (i >= versionB.prerelease.length) {
++      return 1;
++    }
++
++    const cmp = compareIdentifiers(versionA.prerelease[i], versionB.prerelease[i]);
++    if (cmp !== 0) return cmp;
++  }
++
++  return 0;
+ }

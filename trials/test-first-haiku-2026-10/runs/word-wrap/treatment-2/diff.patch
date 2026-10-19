@@ -1,0 +1,72 @@
+diff --git a/src/wrap.mjs b/src/wrap.mjs
+index 829dd05..a4e4bc4 100644
+--- a/src/wrap.mjs
++++ b/src/wrap.mjs
+@@ -5,5 +5,66 @@
+  * @returns {string}
+  */
+ export function wrap(text, width) {
+-  throw new Error("not implemented");
++  // Validate width parameter
++  if (!Number.isInteger(width) || width <= 0) {
++    throw new RangeError("width must be a positive integer");
++  }
++
++  // Split by existing line breaks to preserve paragraph structure
++  const paragraphs = text.split("\n");
++
++  return paragraphs.map(paragraph => {
++    // If paragraph is blank, keep it blank
++    if (!paragraph.trim()) {
++      return "";
++    }
++
++    // Split paragraph into words, collapsing multiple spaces to single spaces
++    const words = paragraph.split(/\s+/);
++    const lines = [];
++    let currentLine = "";
++
++    for (const word of words) {
++      // If word fits on current line
++      if (currentLine.length === 0) {
++        // Start of line
++        if (word.length <= width) {
++          currentLine = word;
++        } else {
++          // Word is longer than width, split it into chunks
++          let chunks = word;
++          while (chunks.length > width) {
++            lines.push(chunks.substring(0, width));
++            chunks = chunks.substring(width);
++          }
++          currentLine = chunks;
++        }
++      } else if (currentLine.length + 1 + word.length <= width) {
++        // Word fits on current line with a space
++        currentLine += " " + word;
++      } else {
++        // Word doesn't fit, push current line and start new one
++        lines.push(currentLine);
++
++        if (word.length <= width) {
++          currentLine = word;
++        } else {
++          // Word is longer than width, split it into chunks
++          let chunks = word;
++          while (chunks.length > width) {
++            lines.push(chunks.substring(0, width));
++            chunks = chunks.substring(width);
++          }
++          currentLine = chunks;
++        }
++      }
++    }
++
++    // Push the last line if it's not empty
++    if (currentLine.length > 0) {
++      lines.push(currentLine);
++    }
++
++    return lines.join("\n");
++  }).join("\n");
+ }

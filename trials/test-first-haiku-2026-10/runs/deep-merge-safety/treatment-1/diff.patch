@@ -1,0 +1,128 @@
+diff --git a/src/merge.mjs b/src/merge.mjs
+index 323592d..ab50563 100644
+--- a/src/merge.mjs
++++ b/src/merge.mjs
+@@ -4,15 +4,32 @@
+  * @param  {...object} sources
+  */
+ export function deepMerge(target, ...sources) {
++  const result = { ...target };
+   for (const source of sources) {
+     for (const key of Object.keys(source)) {
++      // Skip prototype pollution keys
++      if (key === "__proto__" || key === "constructor" || key === "prototype") {
++        continue;
++      }
+       const value = source[key];
+-      if (value && typeof value === "object") {
+-        target[key] = deepMerge(target[key] || {}, value);
++      const targetValue = result[key];
++      // Only merge if both target and source values are plain objects (not arrays or other types)
++      if (
++        value &&
++        typeof value === "object" &&
++        !Array.isArray(value) &&
++        Object.getPrototypeOf(value) === Object.prototype &&
++        targetValue &&
++        typeof targetValue === "object" &&
++        !Array.isArray(targetValue) &&
++        Object.getPrototypeOf(targetValue) === Object.prototype
++      ) {
++        result[key] = deepMerge(targetValue, value);
+       } else {
+-        target[key] = value;
++        // For any other type (including arrays, dates, null), replace completely
++        result[key] = value;
+       }
+     }
+   }
+-  return target;
++  return result;
+ }
+diff --git a/test/merge.test.mjs b/test/merge.test.mjs
+new file mode 100644
+index 0000000..539c7c0
+--- /dev/null
++++ b/test/merge.test.mjs
+@@ -0,0 +1,81 @@
++import assert from "node:assert/strict";
++import { test } from "node:test";
++import { deepMerge } from "../src/merge.mjs";
++
++test("deepMerge does not mutate the first argument", () => {
++  const target = { a: 1 };
++  const source = { b: 2 };
++  const targetCopy = { a: 1 };
++  deepMerge(target, source);
++  assert.deepEqual(target, targetCopy, "target should not be mutated");
++});
++
++test("deepMerge returns a new object", () => {
++  const target = { a: 1 };
++  const source = { b: 2 };
++  const result = deepMerge(target, source);
++  assert.notStrictEqual(result, target, "result should not be the same object as target");
++});
++
++test("deepMerge merges plain objects recursively", () => {
++  const target = { a: { x: 1 } };
++  const source = { a: { y: 2 } };
++  const result = deepMerge(target, source);
++  assert.deepEqual(result, { a: { x: 1, y: 2 } });
++});
++
++test("deepMerge replaces arrays instead of merging them", () => {
++  const target = { a: [1, 2, 3] };
++  const source = { a: [4, 5] };
++  const result = deepMerge(target, source);
++  assert.deepEqual(result, { a: [4, 5] });
++});
++
++test("deepMerge handles null values correctly", () => {
++  const target = { a: 1 };
++  const source = { a: null };
++  const result = deepMerge(target, source);
++  assert.deepEqual(result, { a: null });
++});
++
++test("deepMerge handles Date objects correctly", () => {
++  const date = new Date("2025-01-01");
++  const target = { a: 1 };
++  const source = { a: date };
++  const result = deepMerge(target, source);
++  assert.strictEqual(result.a, date);
++});
++
++test("deepMerge is safe from prototype pollution via __proto__", () => {
++  const target = {};
++  const source = JSON.parse('{"__proto__": {"admin": true}}');
++  const result = deepMerge(target, source);
++  assert.equal(result.admin, undefined, "__proto__ key should be ignored");
++  assert.equal({}.admin, undefined, "Object prototype should not be polluted");
++});
++
++test("deepMerge is safe from prototype pollution via constructor", () => {
++  const target = {};
++  const source = JSON.parse('{"constructor": {"prototype": {"admin": true}}}');
++  const result = deepMerge(target, source);
++  assert.equal(result.admin, undefined, "constructor key should be ignored");
++  assert.equal({}.admin, undefined, "Object prototype should not be polluted");
++});
++
++test("deepMerge is safe from prototype pollution via prototype", () => {
++  const target = {};
++  const source = { prototype: { admin: true } };
++  const result = deepMerge(target, source);
++  assert.equal(result.admin, undefined, "prototype key should be ignored");
++  assert.equal({}.admin, undefined, "Object prototype should not be polluted");
++});
++
++test("deepMerge supports multiple sources", () => {
++  const result = deepMerge({}, { a: 1 }, { b: 2 }, { a: 3 });
++  assert.deepEqual(result, { a: 3, b: 2 });
++});
++
++test("deepMerge later sources win", () => {
++  const result = deepMerge({}, { a: 1, b: { x: 1 } }, { b: { y: 2 } });
++  assert.deepEqual(result, { a: 1, b: { x: 1, y: 2 } });
++});

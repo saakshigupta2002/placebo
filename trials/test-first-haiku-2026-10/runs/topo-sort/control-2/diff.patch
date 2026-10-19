@@ -1,0 +1,112 @@
+diff --git a/src/toposort.mjs b/src/toposort.mjs
+index 2c14f9b..92e278c 100644
+--- a/src/toposort.mjs
++++ b/src/toposort.mjs
+@@ -4,5 +4,106 @@
+  * @returns {string[]}
+  */
+ export function topoSort(graph) {
+-  throw new Error("not implemented");
++  // Collect all nodes (including those that only appear as dependencies)
++  const allNodes = new Set(Object.keys(graph));
++  for (const deps of Object.values(graph)) {
++    for (const dep of deps) {
++      allNodes.add(dep);
++    }
++  }
++
++  // Calculate in-degree for each node
++  const inDegree = new Map();
++  const adjList = new Map();
++
++  for (const node of allNodes) {
++    inDegree.set(node, 0);
++    adjList.set(node, []);
++  }
++
++  // Build adjacency list and in-degree counts
++  // If node A depends on B, then B -> A (B must come before A)
++  for (const [node, deps] of Object.entries(graph)) {
++    for (const dep of deps) {
++      adjList.get(dep).push(node);
++      inDegree.set(node, inDegree.get(node) + 1);
++    }
++  }
++
++  // Find all nodes with no dependencies (in-degree = 0)
++  const queue = Array.from(allNodes)
++    .filter(node => inDegree.get(node) === 0)
++    .sort();
++
++  const result = [];
++  const visited = new Set();
++
++  while (queue.length > 0) {
++    // Process nodes in alphabetical order for determinism
++    queue.sort();
++    const node = queue.shift();
++    result.push(node);
++    visited.add(node);
++
++    // Process all nodes that depend on the current node
++    for (const dependent of adjList.get(node)) {
++      inDegree.set(dependent, inDegree.get(dependent) - 1);
++      if (inDegree.get(dependent) === 0) {
++        queue.push(dependent);
++      }
++    }
++  }
++
++  // Check for cycles
++  if (result.length !== allNodes.size) {
++    // Find a cycle using DFS
++    const cycle = findCycle(graph, allNodes);
++    throw new Error(`cycle: ${cycle.join(" -> ")}`);
++  }
++
++  return result;
++}
++
++/**
++ * Find a cycle in the graph using DFS
++ * @param {Record<string, string[]>} graph
++ * @param {Set<string>} allNodes
++ * @returns {string[]} nodes forming a cycle
++ */
++function findCycle(graph, allNodes) {
++  const visited = new Set();
++  const recStack = new Set();
++  let cycleStart = null;
++  let cycleNodes = [];
++
++  function dfs(node, path) {
++    visited.add(node);
++    recStack.add(node);
++    path.push(node);
++
++    const deps = graph[node] || [];
++    for (const dep of deps) {
++      if (recStack.has(dep)) {
++        // Found a cycle
++        const cycleStartIndex = path.indexOf(dep);
++        return path.slice(cycleStartIndex);
++      }
++      if (!visited.has(dep)) {
++        const result = dfs(dep, path.slice());
++        if (result) return result;
++      }
++    }
++
++    recStack.delete(node);
++    return null;
++  }
++
++  for (const node of allNodes) {
++    if (!visited.has(node)) {
++      const cycle = dfs(node, []);
++      if (cycle) return cycle;
++    }
++  }
++
++  return [];
+ }

@@ -7,6 +7,7 @@ import {
   fmtP,
   fmtValue,
   interventionLine,
+  notesSummary,
   passCounts,
 } from "./format.js";
 
@@ -48,6 +49,8 @@ export function renderMarkdown(t: TrialRecord): string {
       ? `- **Adverse events:** ${kinds.map(([k, v]) => `${ADVERSE_LABELS[k] ?? k} (control ${v.control}, treatment ${v.treatment})`).join("; ")}.`
       : "- **Adverse events:** none in either arm.",
   );
+  const noted = notesSummary(r.adverse.notes);
+  if (noted) out.push(`- **Also noted (information, not adverse):** ${noted}.`);
   out.push(
     `- **Isolation:** ${t.isolation.verified ? "verified" : "not verified"} (${t.isolation.mode} mode). ${t.isolation.notes.join(" ")}`,
   );

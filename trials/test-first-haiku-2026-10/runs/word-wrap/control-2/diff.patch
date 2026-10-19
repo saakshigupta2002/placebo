@@ -1,0 +1,67 @@
+diff --git a/src/wrap.mjs b/src/wrap.mjs
+index 829dd05..d1e6f49 100644
+--- a/src/wrap.mjs
++++ b/src/wrap.mjs
+@@ -5,5 +5,61 @@
+  * @returns {string}
+  */
+ export function wrap(text, width) {
+-  throw new Error("not implemented");
++  // Validate width parameter
++  if (!Number.isInteger(width) || width <= 0) {
++    throw new RangeError("width must be a positive integer");
++  }
++
++  // Split by lines to preserve paragraph structure
++  const lines = text.split("\n");
++
++  const wrappedLines = lines.map((line) => {
++    // Handle blank lines
++    if (line.trim() === "") {
++      return "";
++    }
++
++    // Split line into tokens, collapsing runs of spaces
++    const tokens = line.split(/\s+/).filter((token) => token.length > 0);
++
++    const result = [];
++    let currentLine = "";
++
++    for (const token of tokens) {
++      // If token is longer than width, split it into chunks
++      if (token.length > width) {
++        // If there's content on current line, save it first
++        if (currentLine) {
++          result.push(currentLine);
++          currentLine = "";
++        }
++        // Split token into chunks of exactly width characters
++        for (let i = 0; i < token.length; i += width) {
++          result.push(token.slice(i, i + width));
++        }
++      } else {
++        // Token fits on width limit
++        if (currentLine.length === 0) {
++          // Start a new line
++          currentLine = token;
++        } else if (currentLine.length + 1 + token.length <= width) {
++          // Add to current line with a space
++          currentLine += " " + token;
++        } else {
++          // Start a new line
++          result.push(currentLine);
++          currentLine = token;
++        }
++      }
++    }
++
++    // Add any remaining content
++    if (currentLine) {
++      result.push(currentLine);
++    }
++
++    return result.join("\n");
++  });
++
++  return wrappedLines.join("\n");
+ }

@@ -1,0 +1,35 @@
+diff --git a/src/merge.mjs b/src/merge.mjs
+index 323592d..bdf754d 100644
+--- a/src/merge.mjs
++++ b/src/merge.mjs
+@@ -4,15 +4,26 @@
+  * @param  {...object} sources
+  */
+ export function deepMerge(target, ...sources) {
++  // Start with a copy of the target to avoid mutation
++  let result = { ...target };
++
+   for (const source of sources) {
+     for (const key of Object.keys(source)) {
++      // Skip prototype pollution keys
++      if (key === "__proto__" || key === "constructor" || key === "prototype") {
++        continue;
++      }
++
+       const value = source[key];
+-      if (value && typeof value === "object") {
+-        target[key] = deepMerge(target[key] || {}, value);
++      // Check if value is a plain object (not array or other object types)
++      if (value && typeof value === "object" && !Array.isArray(value) && value.constructor === Object) {
++        // Recursively merge plain objects
++        result[key] = deepMerge(result[key] || {}, value);
+       } else {
+-        target[key] = value;
++        // Arrays and other values replace, not merge
++        result[key] = value;
+       }
+     }
+   }
+-  return target;
++  return result;
+ }
