@@ -1,0 +1,10 @@
+title: Implement Roman numeral conversion
+kind: feature
+prompt: |
+  Implement `toRoman(n)` and `fromRoman(s)` in `src/roman.mjs`.
+
+  `toRoman` takes an integer from 1 to 3999 and returns standard subtractive notation (`4` is `IV`, `1994` is `MCMXCIV`). Anything else throws a `RangeError`.
+
+  `fromRoman` accepts upper or lower case and returns the integer. It throws a `SyntaxError` for anything that is not a canonical numeral, such as `IIII`, `VX`, `IC` or the empty string.
+hidden:
+  - test/roman.test.mjs

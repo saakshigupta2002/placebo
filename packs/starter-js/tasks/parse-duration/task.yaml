@@ -1,0 +1,8 @@
+title: Implement parseDuration
+kind: feature
+prompt: |
+  Implement `parseDuration` in `src/duration.mjs`. It should accept strings like `1h30m`, `90s`, `250ms`, `1.5h` or `2d 4h` and return the total in milliseconds.
+
+  Units are `d`, `h`, `m`, `s` and `ms`. Whitespace between parts is allowed. Throw a `TypeError` for anything it cannot parse, including the empty string and a number without a unit.
+hidden:
+  - test/duration.test.mjs

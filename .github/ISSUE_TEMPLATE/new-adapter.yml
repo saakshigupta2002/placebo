@@ -1,0 +1,21 @@
+name: New agent adapter
+description: Add support for another coding agent
+labels: [adapter, good first issue]
+body:
+  - type: input
+    id: agent
+    attributes:
+      label: Agent
+      description: Name, link and the headless command (for example `gemini -p`).
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Machine-readable output
+      description: Does it emit JSON events or a transcript? Paste a short sanitised sample.
+  - type: textarea
+    id: isolation
+    attributes:
+      label: Isolation
+      description: Where does it load user skills, plugins, MCP servers and instructions from? Can those be switched off per run?

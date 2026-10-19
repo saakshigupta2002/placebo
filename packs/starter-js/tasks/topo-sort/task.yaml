@@ -1,0 +1,10 @@
+title: Implement topoSort with cycle detection
+kind: feature
+prompt: |
+  Implement `topoSort(graph)` in `src/toposort.mjs`. The graph maps each node to the list of nodes it depends on.
+
+  Return every node, including dependencies that never appear as keys, ordered so each node comes after all of its dependencies. When several nodes are ready at once, take them in alphabetical order so the output is deterministic.
+
+  If there is a cycle, throw an `Error` whose message starts with `cycle: ` followed by the nodes on the cycle joined by ` -> `, for example `cycle: a -> b -> a`.
+hidden:
+  - test/toposort.test.mjs

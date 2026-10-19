@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>How Placebo works</title>
+<style>
+:root {
+  --bg: #f6f5f1; --panel: #ffffff; --ink: #18181b; --muted: #6b6b73; --faint: #a3a3aa; --line: #e4e2dc;
+  --accent: #1a7f4b; --accent-bg: #e3f4ea; --bad: #c2362b; --bad-bg: #fbe6e3; --chip: #f0efea;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, sans-serif;
+}
+:root[data-theme="dark"] {
+  --bg: #0d1117; --panel: #161b22; --ink: #e6edf3; --muted: #9198a1; --faint: #5d646d; --line: #30363d;
+  --accent: #4cc38a; --accent-bg: #12301f; --bad: #ff7a6e; --bad-bg: #3a1714; --chip: #21262d;
+}
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); }
+.fig { position: relative; width: 1200px; height: 584px; padding: 0; }
+.title { position: absolute; left: 40px; top: 28px; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+.strap { position: absolute; left: 40px; top: 60px; font-size: 15px; color: var(--muted); }
+.box { position: absolute; background: var(--panel); border: 1.5px solid var(--line); border-radius: 14px; }
+.label { font-size: 15px; font-weight: 650; }
+.term { font: 12px var(--mono); color: var(--muted); margin-top: 3px; }
+.badge { position: absolute; width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: var(--bg); font: 700 14px/26px var(--sans); text-align: center; }
+.commit { background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.commit .msg { font: 13px var(--mono); }
+.chip { font: 600 11px var(--mono); padding: 3px 7px; border-radius: 6px; background: var(--accent-bg); color: var(--accent); white-space: nowrap; }
+.commit.skip { opacity: .55; }
+.commit.skip .msg { text-decoration: line-through; }
+.chip.skip { background: var(--chip); color: var(--muted); }
+.arm { padding: 16px 18px; }
+.arm .row { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.pill { font: 600 12px var(--mono); padding: 4px 9px; border-radius: 999px; background: var(--chip); color: var(--ink); }
+.pill.skill { background: var(--accent-bg); color: var(--accent); }
+.seal { font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+.treat { border-color: var(--accent); border-width: 2px; }
+.results { display: grid; grid-template-columns: repeat(5, 22px); gap: 6px; margin-top: 8px; }
+.res { width: 22px; height: 22px; border-radius: 6px; font: 700 13px/22px var(--sans); text-align: center; }
+.res.ok { background: var(--accent-bg); color: var(--accent); }
+.res.no { background: var(--bad-bg); color: var(--bad); }
+.small { font-size: 12.5px; color: var(--muted); }
+.verdict { display: inline-block; font: 800 15px/1 var(--mono); letter-spacing: .1em; padding: 9px 14px; border-radius: 999px; background: var(--accent); color: var(--panel); margin: 12px 0 10px; }
+.stat { font: 13px var(--mono); margin: 4px 0; }
+.stat b { color: var(--accent); }
+.others { font: 11.5px var(--mono); color: var(--muted); margin-top: 10px; }
+.conclusion { position: absolute; left: 40px; right: 40px; bottom: 20px; padding: 14px 18px; border-radius: 12px; background: var(--accent-bg); color: var(--ink); font-size: 15px; display: flex; justify-content: space-between; gap: 20px; }
+.conclusion b { color: var(--accent); }
+svg.arrows { position: absolute; inset: 0; pointer-events: none; }
+svg.arrows path { fill: none; stroke: var(--faint); stroke-width: 2; }
+svg.arrows .head { fill: var(--faint); stroke: none; }
+.note { position: absolute; font-size: 12.5px; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+<div class="fig" id="fig">
+  <div class="title">How a Placebo trial works</div>
+  <div class="strap">The same real tasks, run by the same agent, with and without the skill. Your own tests decide who did better.</div>
+
+  <!-- 1. history -->
+  <div class="box" style="left:40px; top:110px; width:290px; height:380px; padding:16px;">
+    <div class="label">Your project's history</div>
+    <div class="term">git log</div>
+    <div style="margin-top:14px">
+      <div class="commit"><span class="msg">fix: slugify drops accents</span><span class="chip">+ tests</span></div>
+      <div class="commit"><span class="msg">feat: parseDuration</span><span class="chip">+ tests</span></div>
+      <div class="commit skip"><span class="msg">docs: fix typo</span><span class="chip skip">no tests</span></div>
+      <div class="commit"><span class="msg">fix: CSV quoted commas</span><span class="chip">+ tests</span></div>
+    </div>
+    <div class="small" style="margin-top:12px">Each past fix that came with tests becomes a task, if its tests fail before the fix and pass after it.</div>
+    <div class="term" style="margin-top:6px">placebo mine · validated tasks</div>
+  </div>
+  <div class="badge" style="left:28px; top:98px">1</div>
+
+  <!-- 2. arms -->
+  <div class="box arm" style="left:400px; top:110px; width:380px; height:178px;">
+    <div class="label">Without the skill</div>
+    <div class="term">control arm</div>
+    <div class="row"><span class="pill">Claude Code</span><span class="pill">same model</span><span class="pill">same starting code</span></div>
+    <div class="seal">Sealed copy: no git history to peek at, fake secrets planted, your personal skills switched off.</div>
+  </div>
+  <div class="box arm treat" style="left:400px; top:312px; width:380px; height:178px;">
+    <div class="label">With the skill</div>
+    <div class="term">treatment arm</div>
+    <div class="row"><span class="pill">Claude Code</span><span class="pill">same model</span><span class="pill skill">+ the skill under test</span></div>
+    <div class="seal">Identical sealed copy. The skill is the only difference. Placebo checks that before trusting any result.</div>
+  </div>
+  <div class="badge" style="left:388px; top:98px">2</div>
+
+  <!-- 3. grading -->
+  <div class="box" style="left:850px; top:110px; width:140px; height:380px; padding:16px 14px;">
+    <div class="label">The fix's own tests</div>
+    <div class="term">hidden tests</div>
+    <div class="small" style="margin-top:12px">without</div>
+    <div class="results" style="grid-template-columns: repeat(4, 22px)"><span class="res ok">✓</span><span class="res no">✗</span><span class="res ok">✓</span><span class="res no">✗</span></div>
+    <div class="small" style="margin-top:120px">with</div>
+    <div class="results" style="grid-template-columns: repeat(4, 22px)"><span class="res ok">✓</span><span class="res ok">✓</span><span class="res ok">✓</span><span class="res no">✗</span></div>
+    <div class="small" style="margin-top:22px">plus tokens, cost, time</div>
+  </div>
+  <div class="badge" style="left:838px; top:98px">3</div>
+
+  <!-- 4. verdict -->
+  <div class="box" style="left:1010px; top:110px; width:150px; height:380px; padding:16px 14px;">
+    <div class="label">Task by task</div>
+    <div class="term">paired permutation test</div>
+    <div class="verdict">WORKS</div>
+    <div class="stat">cost <b>−10%</b></div>
+    <div class="small">95% CI −15% to −6%</div>
+    <div class="stat" style="margin-top:10px">tests +5 pts</div>
+    <div class="small">no clear change</div>
+    <div class="stat" style="margin-top:10px">fired 13/20</div>
+    <div class="others">or PLACEBO<br>or HARMFUL<br>or INCONCLUSIVE</div>
+  </div>
+  <div class="badge" style="left:998px; top:98px">4</div>
+
+  <svg class="arrows" viewBox="0 0 1200 584" width="1200" height="584">
+    <path d="M330 300 C 365 300, 365 199, 396 199"/><polygon class="head" points="398,199 388,194 388,204"/>
+    <path d="M330 300 C 365 300, 365 401, 396 401"/><polygon class="head" points="398,401 388,396 388,406"/>
+    <path d="M780 199 L 846 199"/><polygon class="head" points="848,199 838,194 838,204"/>
+    <path d="M780 401 L 846 401"/><polygon class="head" points="848,401 838,396 838,406"/>
+    <path d="M990 300 L 1006 300"/><polygon class="head" points="1008,300 999,295 999,305"/>
+  </svg>
+  <div class="note" style="left:332px; top:428px; width:68px;">every task,<br>both arms</div>
+
+  <div class="conclusion"><span>The two copies differ <b>only in the skill</b>, so any gap in tests passed, cost or behaviour is the skill's doing.</span><span class="small" style="white-space:nowrap">Risky behaviour is caught too: leaked secrets, test tampering.</span></div>
+</div>
+</body>
+</html>

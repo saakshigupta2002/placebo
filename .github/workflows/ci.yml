@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node: [22, 24]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: git config --global user.email "ci@example.com" && git config --global user.name "ci"
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run check:prose
+      - run: npm run build
+      - name: Smoke trial with the fake agent
+        run: |
+          mkdir -p /tmp/smoke && cd /tmp/smoke
+          node $GITHUB_WORKSPACE/dist/cli.js trial $GITHUB_WORKSPACE/test/fixtures/skills/helpful --agent fake --pack starter-js --seed 7 --fail-on harmful,placebo

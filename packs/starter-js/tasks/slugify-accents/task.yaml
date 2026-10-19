@@ -1,0 +1,8 @@
+title: slugify produces broken slugs
+kind: bug
+prompt: |
+  Bug report: `slugify` produces ugly slugs. `slugify("Hello, World!")` returns `hello--world-` instead of `hello-world`. `slugify("Crème Brûlée")` drops the accented letters instead of keeping them as plain letters (`creme-brulee`).
+
+  Slugs should be lowercase, use single dashes between words, have no leading or trailing dashes, keep digits and fold accented Latin letters to their plain form. The fix belongs in `src/slugify.mjs`.
+hidden:
+  - test/slugify.test.mjs

@@ -1,0 +1,18 @@
+export { getAdapter, listAdapters } from "./adapters/registry.js";
+export type { AgentAdapter, RunInput, RunOutput, ToolCall } from "./adapters/types.js";
+export { buildArms, resolveSkill } from "./core/intervention.js";
+export { computeResults } from "./core/results.js";
+export { runTrial, type TrialEvent, type TrialOptions } from "./core/trial.js";
+export type * from "./core/types.js";
+export { renderHtml } from "./report/html.js";
+export { renderMarkdown } from "./report/markdown.js";
+export { renderTerminal } from "./report/terminal.js";
+export * as stats from "./stats/core.js";
+export { computeMetrics } from "./stats/metrics.js";
+export { decideVerdict } from "./stats/verdict.js";
+export { loadTasks, parseTask } from "./tasks/load.js";
+export { mineTasks } from "./tasks/mine-git.js";
+export { listPacks, materializePack } from "./tasks/packs.js";
+export type { Task, TaskSpec } from "./tasks/schema.js";
+export { validateTask } from "./tasks/validate.js";
+export { VERSION } from "./version.js";

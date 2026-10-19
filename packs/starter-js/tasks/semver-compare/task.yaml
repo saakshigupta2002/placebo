@@ -1,0 +1,8 @@
+title: Implement compareVersions
+kind: feature
+prompt: |
+  Implement `compareVersions(a, b)` in `src/semver.mjs`. It returns -1, 0 or 1 following Semantic Versioning 2.0.0 precedence.
+
+  Compare major, minor and patch numerically. A version with a pre-release tag (`1.0.0-alpha`) is lower than the same version without one. Pre-release identifiers are compared dot by dot. Numeric identifiers compare numerically and rank below alphanumeric ones. Alphanumeric identifiers compare in ASCII order. When all earlier identifiers are equal, the shorter set is lower. Build metadata after `+` is ignored. A leading `v` is allowed. Throw a `TypeError` for anything that is not a valid version.
+hidden:
+  - test/semver.test.mjs

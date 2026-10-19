@@ -1,0 +1,10 @@
+title: Implement parseQuery and stringifyQuery
+kind: feature
+prompt: |
+  Implement `parseQuery(qs)` and `stringifyQuery(obj)` in `src/query.mjs`.
+
+  `parseQuery` accepts a string with or without a leading `?`. It decodes percent-escapes and treats `+` as a space. Keys without `=` get an empty string value. Repeated keys become arrays in the order they appear.
+
+  `stringifyQuery` does the reverse: keys sorted alphabetically, arrays become repeated keys, values encoded with `encodeURIComponent` (so spaces become `%20`) and `undefined` values skipped. Neither function should throw on empty input.
+hidden:
+  - test/query.test.mjs

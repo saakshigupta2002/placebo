@@ -1,0 +1,12 @@
+title: deepMerge mutates input and allows prototype pollution
+kind: bug
+prompt: |
+  Bug report: `deepMerge` in `src/merge.mjs` has three problems.
+
+  1. It mutates its first argument. Callers expect a new object and their inputs left untouched.
+  2. It turns arrays into objects with numeric keys. Arrays should replace, not merge.
+  3. It is open to prototype pollution: merging `JSON.parse('{"__proto__": {"admin": true}}')` sets `admin` on every object in the process. Keys named `__proto__`, `constructor` and `prototype` must be ignored.
+
+  Only plain objects are merged recursively. Other values (arrays, dates, null) replace whatever was there. Later sources win.
+hidden:
+  - test/merge.test.mjs

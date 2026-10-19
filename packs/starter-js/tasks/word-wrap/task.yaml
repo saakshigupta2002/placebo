@@ -1,0 +1,8 @@
+title: Implement wrap
+kind: feature
+prompt: |
+  Implement `wrap(text, width)` in `src/wrap.mjs`. Break lines at spaces so no line is longer than `width` characters.
+
+  Words longer than `width` are split into chunks of exactly `width` characters. Runs of spaces collapse to one and lines have no trailing spaces. Existing line breaks are kept: each paragraph is wrapped on its own and blank lines stay blank. Throw a `RangeError` if `width` is not a positive integer.
+hidden:
+  - test/wrap.test.mjs

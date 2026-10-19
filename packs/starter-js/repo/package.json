@@ -1,0 +1,11 @@
+{
+  "name": "kit",
+  "version": "0.3.0",
+  "description": "Small, dependency-free JavaScript utilities.",
+  "type": "module",
+  "main": "src/index.mjs",
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,12 @@
+title: formatMoney output is not usable on invoices
+kind: bug
+prompt: |
+  Bug report: `formatMoney` in `src/money.mjs` is not usable on invoices.
+
+  - Large amounts have no thousands separators: `123456789` cents should be `$1,234,567.89`.
+  - Negative amounts come out as `$-5.00` instead of `-$5.00`.
+  - Yen are shown with decimals even though JPY has no minor unit. `formatMoney(1500, "JPY")` should be `¥1,500` because the amount is already in whole yen.
+
+  Unknown currencies keep the existing `CODE 1.00` style. Non-integer cents must throw a `TypeError` instead of being rounded silently.
+hidden:
+  - test/money.test.mjs

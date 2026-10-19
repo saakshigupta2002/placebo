@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Placebo">
+  <title>Placebo</title>
+  <g transform="rotate(-38 60 60)">
+    <path d="M60 42 H84 A18 18 0 0 1 84 78 H60 Z" fill="#ededef"/>
+    <rect x="18" y="42" width="84" height="36" rx="18" fill="none" stroke="#ededef" stroke-width="5"/>
+    <line x1="60" y1="42" x2="60" y2="78" stroke="#ededef" stroke-width="5"/>
+  </g>
+</svg>

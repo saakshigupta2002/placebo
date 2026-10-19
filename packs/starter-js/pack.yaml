@@ -1,0 +1,6 @@
+name: starter-js
+description: A small JavaScript utility library with 12 tasks (features and bug reports). Zero dependencies, graded with node:test.
+language: javascript
+check: node --test {files}
+timeout: 600
+checkTimeout: 120

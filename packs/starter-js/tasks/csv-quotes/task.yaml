@@ -1,0 +1,13 @@
+title: parseCSV breaks on Excel exports
+kind: bug
+prompt: |
+  Bug report: `parseCSV` breaks on real spreadsheets exported from Excel.
+
+  - Quoted fields that contain commas get split in two.
+  - Doubled quotes (`""`) inside a quoted field should become a single quote.
+  - Quoted fields can contain line breaks.
+  - Files with Windows line endings (`\r\n`) leave a stray `\r` on the last field.
+
+  Empty fields must be kept (`a,,c` is three fields). A trailing newline at the end of the file should not produce an extra empty row. The parser lives in `src/csv.mjs`.
+hidden:
+  - test/csv.test.mjs

@@ -1,0 +1,8 @@
+title: Implement LRUCache
+kind: feature
+prompt: |
+  Implement `LRUCache` in `src/lru.mjs`: `new LRUCache(capacity)` with `get(key)`, `set(key, value)`, `has(key)`, `delete(key)` and a `size` getter.
+
+  When a `set` pushes the cache past capacity, evict the least recently used entry. Both `get` and `set` count as a use; `has` does not. `get` returns `undefined` for missing keys and `delete` returns whether something was removed. The constructor throws a `RangeError` unless capacity is a positive integer. `set` returns the cache so calls can be chained.
+hidden:
+  - test/lru.test.mjs

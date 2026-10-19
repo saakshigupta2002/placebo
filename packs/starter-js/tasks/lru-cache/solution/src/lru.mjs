@@ -1,0 +1,39 @@
+/** A least-recently-used cache with a fixed capacity. */
+export class LRUCache {
+  #capacity;
+  #map = new Map();
+
+  /** @param {number} capacity */
+  constructor(capacity) {
+    if (!Number.isInteger(capacity) || capacity <= 0)
+      throw new RangeError("capacity must be a positive integer");
+    this.#capacity = capacity;
+  }
+
+  get size() {
+    return this.#map.size;
+  }
+
+  get(key) {
+    if (!this.#map.has(key)) return undefined;
+    const value = this.#map.get(key);
+    this.#map.delete(key);
+    this.#map.set(key, value);
+    return value;
+  }
+
+  set(key, value) {
+    this.#map.delete(key);
+    this.#map.set(key, value);
+    if (this.#map.size > this.#capacity) this.#map.delete(this.#map.keys().next().value);
+    return this;
+  }
+
+  has(key) {
+    return this.#map.has(key);
+  }
+
+  delete(key) {
+    return this.#map.delete(key);
+  }
+}
