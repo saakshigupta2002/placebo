@@ -62,7 +62,7 @@ You get a table in the terminal, a self-contained `report.html` (the card above)
 
 <p align="center">
   <a href="docs/assets/placebo-demo.mp4">
-    <img src="docs/assets/demo-walkthrough.gif" width="900" alt="Walkthrough: a real trial runs in the terminal and ends Harmful, the report opens in a browser and scrolls through the verdict, every effect with its interval, adverse events and the task drill-down, then a new version of the skill is tested against the last commit and Placebo says it needs about 17 tasks to settle.">
+    <img src="docs/assets/demo-walkthrough.gif" width="100%" alt="Walkthrough: a real trial runs in the terminal and ends Harmful, the report opens in a browser and scrolls through the verdict, every effect with its interval, adverse events and the task drill-down, then a new version of the skill is tested against the last commit and Placebo says it needs about 17 tasks to settle.">
   </a>
 </p>
 

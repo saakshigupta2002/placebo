@@ -7,9 +7,8 @@
     "studio": "remotion studio",
     "bundle": "remotion bundle --log=error",
     "render:mp4": "remotion render build Demo ../docs/assets/placebo-demo.mp4 --crf=20 --concurrency=2",
-    "render:gif": "remotion render build Demo ../docs/assets/demo-walkthrough.gif --codec=gif --every-nth-frame=3 --scale=0.5 --concurrency=2",
-    "poster": "remotion still build Demo ../docs/assets/demo-poster.png --frame=410",
-    "all": "npm run bundle && npm run render:mp4 && npm run render:gif && npm run poster"
+    "render:gif": "bash scripts/make-gif.sh",
+    "all": "npm run bundle && npm run render:mp4 && npm run render:gif"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.513",

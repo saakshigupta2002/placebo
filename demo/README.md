@@ -5,7 +5,7 @@ Source of the README walkthrough, built with [Remotion](https://www.remotion.dev
 ```bash
 cd demo
 npm install          # remotion, react
-npm run all          # bundle, then render the MP4, the GIF and the poster into ../docs/assets
+npm run all          # bundle, render the MP4, then build the README GIF from it (scripts/make-gif.sh)
 npm run studio       # live preview while editing
 ```
 
